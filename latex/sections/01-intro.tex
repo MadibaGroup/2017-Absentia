@@ -1,13 +1,15 @@
 % !TEX root = ../main.tex
 \section{Introductory Remarks}
 
-Consider the now classic Millionaire's problem where Alice and Bob both have a secret value that represents their wealth, $\EncB{a}$ and $\EncB{b}$ respectively. They wish to learn the value $z=\mathsf{Max}(a,b)$ without disclosing $a$ or $b$ to each other. In general, $\mathsf{Max}$ could be any deterministic function that is computable in reasonable time and the inputs to the function might include more than two private inputs. 
+Consider the now classic Millionaire's problem where Alice and Bob both have a secret value that represents their wealth, $\EncB{a}$ and $\EncB{b}$ respectively. They wish to learn which of them is wealthier without disclosing $a$ or $b$ to each other.
 
-The general approach of the literature is to have Alice and Bob run a joint protocol on their private inputs that requires them to coordinate and complete a few rounds of communication.
+The approach of the literature is to have Alice and Bob run a joint protocol on their private inputs that requires them to coordinate and complete a few rounds of communication. In general, it is possible to have $n$ parties jointly compute a deterministic function such that each party's input remains private. This is multi-party computation (MPC).
 
-Our goal in this paper is to explore a model where Alice can leave an encryption of $a$, $\EncB{a}$, in a public place and Bob can leave $\EncB{b}$. We defer a discussion of what encryption key is used. Later they can return to receive $\EncB{z}_a$ and $\EncB{z}_b$ where this is $z$ encrypted under their individual keys. When they fetch this value, they are confident $z$ is correct.
+In general, MPC requires that all parties involved be online, since they must send many message between them. A Byzantine fault, such as a party going offline, brings the MPC to a halt until it is resolved.
 
-Between leaving their private inputs and retrieving the output, the computation itself is performed --- not by Alice and Bob, but by some workers they have outsourced the computation to. These workers should not learn $a$, $b$, $z$ or any intermediary values of the computation under some reasonable assumption (we rely on non-collusion between them). 
+Our goal in this paper is to explore a model where Alice can leave an encryption of $a$, $\EncB{a}$, in a public place, where Bob can similarly leave $\EncB{b}$. We defer a discussion of what encryption key is used. Later they can return to receive $\EncB{z}_a$ and $\EncB{z}_b$ where $z$ is the output of their function, and is encrypted under their individual keys. When they fetch this value, they are confident $z$ is correct.
+
+Between leaving their private inputs and retrieving the output, the computation itself is performed --- not by Alice and Bob, but by some workers they have outsourced the computation to. These workers should not learn $a$, $b$, $z$ or any intermediary values of the computation under some reasonable assumption (we rely on non-collusion between them).
 
 
 \subsection{Threat Model}
