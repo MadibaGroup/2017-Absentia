@@ -10,35 +10,19 @@ Our goal in this paper is to explore a model where Alice can leave an encryption
 Between leaving their private inputs and retrieving the output, the computation itself is performed --- not by Alice and Bob, but by some workers they have outsourced the computation to. These workers should not learn $a$, $b$, $z$ or any intermediary values of the computation under some reasonable assumption (we rely on non-collusion between them). 
 
 
-\subsection{Scope}
+\subsection{Threat Model}
 
-Threat model: secret inputs, correct computation
+Security enters the discussion of function evaluation in two basic ways. The first is that the computation should be performed correctly. The second is that the function inputs (and potentially outputs) should be kept confidential from some participants. Without these security constraints, we are in the domain of distributed computing.
 
+Verifiable computing studies the issue of a computation being executed correctly. If Alice performs the computation herself, she does not need a correctness guarantee but there are two basic reasons she might not compute it herself. The first is that it might be cheaper to outsource the computation to the cloud and verify a proof of correctness than to compute it (with or without privacy of her inputs/outputs from the cloud). The second is that the computation might involve the private input of someone else, for example Bob, and so Alice has no way to perform it herself (and likewise Bob does not either if Alice has a private input).
 
-No secrets, trust computation
-- cloud computing problem
+We concern ourselves with the latter case. Alice and Bob can run a joint protocol, typically one based on garbled circuits for a two-party computation (2PC) or one based on verifiable secret sharing for the multi-party case (MPC). Alternatively a protocol might be based on homomorphic encryption, whether fully homomorphic or partially homomorphic. The most modern approach is to blend techniques, for example using FHE for a pre-computation round and MPC for online execution of the circuit (SPDZ).
 
-No secrets, no trust
-- verifiable computing
+If Alice and Bob care not to evaluate the correctness of the computation (they trust each other or someone they delegated the computation to), we can operate in the honest-but-curious model largely using the protocols established in the 1970s and 80s with a few modernizations. However when they care about correctness, a trickier malicious model must be considered that brings additional complexity to the protocols. Typically, a secure function evaluation (SFE) that is secure in the malicious model involves interactive proofs of correctness between the participants that are verifiable by the participants (and only the participants). A higher-reaching goal is public verifiability, where proofs are written to a public transcript and can be used by anyone to verify the computation was performed correctly.
 
-one secret, no trust
-- verifiable computing
+Public verifiability enables two interesting properties. The first is that Alice and Bob can delegate the computation to someone else to compute and they do not have to trust the delegatees for correctness (they do have to trust them not to collude and reveal their private inputs). Even stronger, someone beyond Alice, Bob, and the delegatees can verify the correctness.
 
-two or more secrets, trust
-- honest but curious model - two GC, three+ MPC (based on secret sharing)
-
-two or more secrets, no trust
-- malicious model - same as above, plus mix and match 
-
-public verifiable
-- mix and match 
-
-One secret, no trust, public verifiable 
-FHE (more than one secret - who has decryption key?) 
-Joint decryption at the end for MPC
-
-Functional encryption
-- seems different
+While it is not framed as publicly verifiable SFE, the Mix and Match protocol from Jakobsson and Juels provides this property. It works in the two-party and multi-party case (the constraints are on the number of delegatees not private inputs).\footnote{For what it is worth, it works in the one-party case as well but without further optimization, the proofs are far more expensive than the computation being performed. However since it is publicly verifiable, verification could also be delegated.}
 
 \subsection{Deployability}
 
