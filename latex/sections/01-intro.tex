@@ -1,26 +1,70 @@
 % !TEX root = ../main.tex
 \section{Introductory Remarks}
 
-Blah blah blah.
+Threat model: secret inputs, correct computation
+
+
+No secrets, trust computation
+- cloud computing problem
+
+No secrets, no trust
+- verifiable computing
+
+one secret, no trust
+- verifiable computing
+
+two or more secrets, trust
+- honest but curious model - two GC, three+ MPC (based on secret sharing)
+
+two or more secrets, no trust
+- malicious model - same as above, plus mix and match 
+
+public verifiable
+- mix and match 
+
+One secret, no trust, public verifiable 
+FHE (more than one secret - who has decryption key?) 
+Joint decryption at the end for MPC
+
+Functional encryption
+- seems different
+
+\subsection{Deployability}
+
+Multi users with secrets
+
+Users to not have to be online at the same time (excludes GC, MPC, etc) - one round of communication to submit inputs
+
+they will have to submit somehow: minimize what they need to know at submission time. encrypt it but need to know a key - to know key, need to know computational trustees
+
+minimize privacy assumptions around submission - submit to a public broadcast channel (as opposed to private channels with trustees) 
+
+at the end, they have to receive the output - public channel, asynchronous, one round of communication, 
+
+at the end, they have to check a proof - great to delegate proof to others so they don't have to check (public verifiability vs normal malicious model)
+
+\subsection{Mix and Match}
+
+There is only one SFE protocol that seems to work this way out of the box: Mix and Match.
+
+Users, Trustees, Miners
+
+\subsection{Trustees}
+
+Why did mix and match fail? Who are the trustees going to be? IBM, Microsoft, Google in 2-out-of-3 is great for papers but not realistic 
+
+Anyone can be with some human verification on top - Tor model 
+
+Plus, unlike Tor, we can pay them
+
+\subsection{Coordination}
+
+Bulletin board: append-only (immutable) broadcast (non-equivocating) - blockchain
+Payments: blockchain
+Verification for free: blockchain
+
+Which blockchain? Ethereum
+Other related projects: Enigma
 
  
-% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-\paragraph{Scope.} 
-Blah blah blah.
-
-% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-\paragraph{Contributions.} 
-Our primary contributions are as follows.
-
-\begin{enumerate}
-
-\item Blah blah blah.
-
-\item Blah blah blah. 
-
-\item Blah blah blah. 
-
-\end{enumerate}
 
