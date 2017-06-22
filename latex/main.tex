@@ -1,0 +1,56 @@
+\documentclass[envcountsect]{llncs}
+\pagestyle{headings} 
+\bibliographystyle{abbrv}
+
+% = = = = = Packages = = = = = %
+
+\input{setup/packages}
+%\input{setup/macros}
+
+
+% = = = = = Title = = = = = %
+
+\begin{document}
+\frontmatter
+\mainmatter
+
+\title{\Large \bf The Title}
+
+\author{
+	Jeremy Clark\inst{1}
+	}
+
+\institute{
+	Carleton University \\*
+	\email{clark@scs.carleton.ca} 
+	}
+
+\maketitle
+
+
+% = = = = = Abstract = = = = = %
+
+\input{sections/00-abstract}
+
+% = = = = = Main Body = = = = = %
+
+\input{sections/01-intro}
+
+% = = = = = Bibliography = = = = = %
+
+\bibliography{bib/}
+%\nocite{*}
+
+% = = = = = End Notes = = = = = %
+
+\clearpage
+\appendix
+
+\end{document}
+
+
+
+
+
+
+
