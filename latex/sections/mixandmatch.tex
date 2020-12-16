@@ -1,0 +1,74 @@
+\section{}
+
+\begin{table}[]
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		Contract & Function  & Gas  & Gas Cost (\$)  \\ \hline
+		\multirow{9}{*}{}  
+		& loadFund & 28040  &1.50  \\ \cline{2-4} 
+		& checkBalances &  30359& 1.63 \\  \cline{2-4} 
+		&  loadOutputs&  300798 & 16.13 \\  \cline{2-4} 
+		&  createRow1 & 8741453 & 468.90 \\  \cline{2-4}
+	Mixmatch.sol	&  matchingRow & 37547 &2.01  \\  \cline{2-4}
+		& matchingValue &  40868&2.19 \\  \cline{2-4}
+		&  createFinalDecryption&  4430611& 237.66 \\  \cline{2-4}
+		& sendexcessfunds &  41110& 2.21 \\  \cline{2-4}
+		& withdraw &  39221& 2.10 \\   \hline
+		\multirow{8}{*}{} 
+		&  loadCiphertexts & 304668 & 16.34 \\  \cline{2-4}
+		& PET\_subtract & 242131 & 12.99\\  \cline{2-4}
+		&  DHProve\_Trustee1Pf\_Rand& 815340 &  43.74\\  \cline{2-4}
+	PET.sol	&  DHProve\_Trustee2Pf\_Rand& 393561 &21.11  \\  \cline{2-4}
+		&  DHProve\_Trustee1Pf\_PartialDec& 364298 & 19.54\\  \cline{2-4}
+		& DHProve\_Trustee2Pf\_PartialDec & 363612 & 19.50 \\  \cline{2-4}
+		& FullDecryption  &  107086& 5.74 \\  \cline{2-4}
+		&  loadFinalCiphertext& 173945 & 9.33\\ \hline
+	\end{tabular}
+\caption{Table description!! (Gas on Dec 01, 2020 is 0.000000087210450983 ETH)} \label{tab:gas}
+\end{table}
+
+
+\begin{table}[]
+	\begin{tabular}{|l|l|}
+		\hline
+	code	& Size(bytes)  \\ \hline
+	bytecode	& 27178  \\ \hline
+	deployed	& 26774  \\ \hline
+	initialisation and constructor code 	& 404 \\ \hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[]
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		& Alice &  Bob & Trustee1*  & Trustee2  \\ \hline
+	Number of Transactions	&  &  &  &  \\ \hline
+	Total gas cost	&  &  &  &  \\ \hline
+	Total cost in USD	&  &  &  &  \\ \hline
+	\end{tabular}
+\end{table}
+
+~\textbf{Alice:} can call loadFunds more than once. She has to call loadCiphertexts for each PET (8 times).
+
+~\textbf{Bob:} can call loadFunds more than once. He has to call loadCiphertexts for each PET (8 times).
+
+~\textbf{Trustee1:} is also the manager. Trustee1 calls the loadOutputs twice in the beginning of the protocol. The following is repeated for each PET (8 times): 
+\begin{enumerate}
+	\item createRow1
+	\item PET\_subtract
+	\item DHProve\_Trustee1Pf\_Rand
+	\item DHProve\_Trustee1Pf\_PartialDec
+	 \item FullDecryption
+\end{enumerate}
+
+After all PETs are run, Trustee1 has to run the following:
+\begin{enumerate}
+	\item matchingRow
+	\item matchingValue
+	\item createFinalDecryption
+	\item loadFinalCiphertext
+	\item DHProve\_Trustee1Pf\_PartialDec
+	\item FullDecryption
+\end{enumerate}
+
+~\textbf{Trustee2:} calls DHProve\_Trustee2Pf\_Rand and DHProve\_Trustee2Pf\_PartialDec for each PET (8 times) and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
