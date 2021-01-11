@@ -123,3 +123,27 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{mdframed}
 
 Steps $2-6$ are repeated for each input cell.
+
+Absentia is a system that performs secure function evaluation on Ethereum. The parties leave their secret, encrypted inputs to the system and the rest is handled in the absence of them (submit-and-go property).
+
+The system is first implemented in Mathematica to have test vectors for the Solidity implementation. For our example, we used AND gate and there are two trustees that perform the computations. One of the trustees is designated as the manager who is responsible for creating and encrypting the table and finding the matching value at the end of the protocol.
+
+The system is composed of two smart contracts and a library to perform elliptic curve operations.
+
+The gas limit in Truffle is set to $0xBD6EE1$.
+
+The elliptic curve library is taken from~\footnote{\url{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}}. As multiplication is the most expensive function, we do not perform the multiplication itself in the smart contract. Instead, we use the trick explained in~\footnote{\url{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}}. Multiplication is preformed off-chain and the function $ecmulVerify$ takes the multiplicand, scalar and the product as input and verifies that the multiplication is done correctly.
+
+Contract size limit is 24KB according to EIP170. As our main contract is over this limit, we ran our test in Truffle by allowing unlimited contract size.
+
+Factory design pattern is used to realize the system. Mix and match contract creates instances of PET contract for each cell in the NAND table , so that Alice and Bob's inputs are compared against related cells.
+
+Depositing values to each PET vs depositing once
+
+How payments are handled? 
+
+Alice and Bob can deposit money any time they want during the protocol. They can also withdraw any excess amount from their balances as long as there is still enough funds left to pay the trustees. They can also withdraw funds either before the protocol starts or after the protocol ends, in the case where they accidentally deposited funds. Otherwise, the funds are kept for a month, until it can be withdrawn again. ~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}} is used to prevent reentrancy attack.
+
+Funds are transferred tot the trustees at the end of the protocol, after thay determined the final output. In another possible design, trustees can be paid at each step they performed towards reaching the final output.
+
+
