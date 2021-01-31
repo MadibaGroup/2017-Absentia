@@ -228,3 +228,71 @@ rollups on arbitrum
 functions are performed off-chain and the result is written back to the chain, which is verifiable
 
 dispute resolution
+
+
+%\usetikzlibrary{calc}
+%
+%\resizebox{200pt}{200pt}{%
+%
+%	\begin{tikzpicture}
+%	\coordinate (a) at (0,0);
+%	\coordinate (b) at (0,1);
+%	\coordinate (c) at (1,0);
+%	\coordinate (d) at (1,1);
+%	\coordinate (e) at (2,0);
+%		\coordinate (f) at (2,1);
+%	\draw (a) -- (b)node[pos=1.1,scale=0.25]{Client} 
+%	(c) -- (d)node[pos=1.1,scale=0.25]{Server}
+%	(e) -- (f)node[pos=1.1,scale=0.25]{Client} ;
+%	\draw[-stealth] ($(a)!0.75!(b)$) -- node[above,scale=0.25,midway]{\href{https://www.google.ca/}{Text}}($(c)!0.75!(d)$);
+%	\draw[stealth-] ($(a)!0.65!(b)$) -- node[below,scale=0.25,midway]{Hey} ($(c)!0.65!(d)$);
+%	\end{tikzpicture}
+%	}
+%
+%\begin{sequencediagram}
+%	\newthread{t}{:Thread}
+%	\newinst[1]{i}{:Instance}
+%	
+%	\begin{sdblock}{alt}{[condition]}
+%		\begin{call}{t}{if\_true()}{i}{}
+%		\end{call}
+%		
+%
+%		
+%		\begin{call}{t}{if\_false()}{i}{}
+%		\end{call}
+%	\end{sdblock}
+%\end{sequencediagram}
+%
+%\begin{sequencediagram}
+%\newthread[white]{u}{User}
+%\newinst[3]{b}{Browser}
+%\newinst[3]{t}{TPM}
+%\newinst[3]{p}{TTP}
+%
+%\begin{call}{u}{Init()}{b}{}
+%\end{call}
+%
+%\begin{call}{u}{\href{https://www.google.ca/}{Text}}{b}{}
+%
+%\mess{b}{verifyAIKAuthSecret}{t}
+%
+%\begin{call}{b}{get AIK$_{pub}$}{t}{AIK$_{pub}$}
+%\end{call}
+%
+%\end{call}
+%\begin{sdblock}{Loop}{}
+%
+%\begin{call}{u}{Do Something}{p}{AIK$_{pub}$}
+%\end{call}
+%\end{sdblock}
+%\end{sequencediagram}
+
+
+\begin{sequencediagram}
+	\newthread{t}{:Thread}
+	\newinst[1]{i}{:Instance}
+	
+	\begin{call}{t}{\href{https://kovan.etherscan.io/tx/0x10788165eacbbe25066c163fa0cf7a5af07da32c05af001d0f05ad8946974c6e}{Text}}{i}{return value}
+	\end{call}
+\end{sequencediagram}
