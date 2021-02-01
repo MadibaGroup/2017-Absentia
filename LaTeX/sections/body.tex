@@ -4,14 +4,25 @@
 
 \textblue{Great opening sentence here.} Introduction and motivaton.
 
-\paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question we is whether MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
+\subsection{Design decision}
 
-\paragraph{Design decision: Mix and match.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluation a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an MPC protocol for the basis of Absentia, we looked for the following properties:
+\paragraph{Design decision: Trustee model.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluate a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an MPC protocol for the basis of Absentia, we looked for one with the following properties:
+
+\paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question we is whether MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{sec:arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
+
+\paragraph{Design decision: Mix and match.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluate a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an SFE/MPC protocol for the basis of Absentia, we looked for one with the following properties:
 
 \begin{enumerate}
-\item \textbf{Submit and Go.}
-\item \textbf{Publicly Verifiable.}
+\item \textbf{Trustee model.} As justified above, we seek an MPC/SFE protocol that lets the input holders (\eg Alice and Bob) offload their inputs to a set of trustees for evaluation. 
+\item \textbf{Publicly verifiable} (aka publicly auditable or universally verifiable). Many MPC/SFE protocols are in the semi-honest (\ie honest-but-curious) model. Some are resilient to covert or malicious adversaries. We require that not only can adversarial behaviour  be detected by the participates in the protocol, but that it can be detected by anyone (\ie the public). This allows (a) Alice and Bob to offload the computational work to the trustees and still ensure the output is correct, even if they did not directly participate, and (b) Alice and Bob can go further and offload the verification itself to someone they trust---the Ethereum network in this case.
+\item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arimatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
+\item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA siganatures) on the elliptic curve \texttt{secp256k1}. For easy of implementation, we preferred an MPC with the same cryptographic setting. 
 \end{enumerate}
+
+One MPC protocol that is sufficient in Mix and Match~\cite{JJ00}. 
+
+We are not aware of an explict \emph{proof} that Mix and Match is publicly verifiable, however every step of the protocol is covered by a trustee issuing a non-interactive zero knowledge proof. In fact, it appears that even when all trustees fully collude, trustees can only break privacy (and not integrity) with the exception of one sub-protocol, as noted in ~\cite{JJ00}, called the \emph{plaintext equality test} (PET). Despite the authors' caution, many have used the PET protocol as if it is publicly verifiable (with some justification based on statistical arguments)~\cite{}. Recently it was shown the statistical arguments are not sufficient but the PET protocol can be made publicly verifiable with a simple additional check on the final output~\cite{}.
+
 
 \section{Preliminaries}
 
@@ -96,6 +107,7 @@ We assume the reader is familiar with blockchain technology, Ethereum, and smart
 
 
 \section{System design}
+\label{sec:system}
 
 ~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4
 
@@ -272,6 +284,10 @@ How payments are handled?
 Alice and Bob can deposit money any time they want during the protocol. They can also withdraw any excess amount from their balances as long as there is still enough funds left to pay the trustees. They can also withdraw funds either before the protocol starts or after the protocol ends, in the case where they accidentally deposited funds. Otherwise, the funds are kept for a month, until it can be withdrawn again. ~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}} is used to prevent reentrancy attack.
 
 Funds are transferred tot the trustees at the end of the protocol, after thay determined the final output. In another possible design, trustees can be paid at each step they performed towards reaching the final output.
+
+
+\section{Design variant on layer 2 }
+\label{sec:arb}
 
 ~\subsection{Arbitrum}
 ~\cite{kalodner2018arbitrum}

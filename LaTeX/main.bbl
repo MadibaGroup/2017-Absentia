@@ -3,6 +3,12 @@
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{https://doi.org/#1}
 
+\bibitem{zkvm}
+Andreev, O., Glickstein, B., Niu, V., Rinearson, T., Sur, D., Yun, C.: {ZkVM:
+  fast, private, flexible blockchain contracts} (May 2019),
+  \url{https://github.com/stellar/slingshot/blob/main/zkvm/docs/zkvm-design.md},
+  [Online; accessed 1 February 2021]
+
 \bibitem{andrychowicz2014secure}
 Andrychowicz, M., Dziembowski, S., Malinowski, D., Mazurek, L.: Secure
   multiparty computations on bitcoin. In: 2014 IEEE Symposium on Security and
@@ -23,6 +29,11 @@ Damg{\aa}rd, I., Keller, M., Larraia, E., Pastro, V., Scholl, P., Smart, N.P.:
   Practical covertly secure mpc for dishonest majority--or: breaking the spdz
   limits. In: European Symposium on Research in Computer Security. pp. 1--18.
   Springer (2013)
+
+\bibitem{damgaard2012multiparty}
+Damg{\aa}rd, I., Pastro, V., Smart, N., Zakarias, S.: Multiparty computation
+  from somewhat homomorphic encryption. In: Annual Cryptology Conference. pp.
+  643--662. Springer (2012)
 
 \bibitem{GMR+20}
 Gudgeon, L., Moreno-Sanchez, P., Roos, S., McCorry, P., Gervais, A.: Sok:
@@ -53,6 +64,13 @@ Lu, D., Yurek, T., Kulshreshtha, S., Govind, R., Kate, A., Miller, A.:
   application to anonymous communication. In: Proceedings of the 2019 ACM
   SIGSAC Conference on Computer and Communications Security. pp. 887--903
   (2019)
+
+\bibitem{sanchez2018raziel}
+S{\'a}nchez, D.C.: Raziel: Private and verifiable smart contracts on
+  blockchains. arXiv preprint arXiv:1807.09484  (2018)
+
+\bibitem{Yao82}
+Yao, A.C.: Protocols for secure computations. In: IEEE FOCS (1982)
 
 \bibitem{zyskind2015enigma}
 Zyskind, G., Nathan, O., Pentland, A.: Enigma: Decentralized computation
