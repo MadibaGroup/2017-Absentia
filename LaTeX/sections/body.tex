@@ -2,31 +2,39 @@
 
 \section{Introduction}
 
-\textblue{Great opening sentence here.} Introduction and motivaton.
+Consider the traditional multi-party computational setting with a twist: Alice and Bob each have some data, they would like to know the output from running an agreed-upon function on their data, each does not want the other (or anyone else) to learn their data, and they want to simply submit their data (\eg encrypted) to a trustworthy system and come back later for the result. They are willing to pay for this service and understand that, in the worst case of massive collusion between the operators of this service (called trustees), their inputs may be exposed but the result will always be correct.
 
-\subsection{Design decision}
+We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). Can these technologies help? In theory? In practice? We seek to answer this question through direct experimentation. The abstract above builds the argument for why blockchain can help: (1) it provides a integral point of coordination where trustees can post and track progress on the evaluation; (2) it provides an in-band solution for paying the trustees (in either a cryptocurrency like ETH or in a stablecoin pegged to the value of governmental currency like the USD) in a way that is contingent on their performance; and (3) it can server as the public verifier and can reject any protocol proof that is not correct. When Alice and Bob retrieve the result (whether in plaintext or individually encrypted under their keys), they know it must be correct, otherwise it would not be there waiting for them.
 
-\paragraph{Design decision: Trustee model.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluate a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an MPC protocol for the basis of Absentia, we looked for one with the following properties:
+Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimist roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Abstentia substantially more practical (with room for further improvement).
+ 
+\subsection{Key design decisions}
+
+Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Abstentia provides; and reserve the term multiparty computation (MPC) for a more setting where stateful computations might be performed over time.
+
+\paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We assume the number of trustees ($n$) can be chosen independently of the number of inputs. In Abstentia, we simply our implementation to only support rubostness in the case that all trustees ($n$-out-of-$n$) participate, however this could modified to allow the protocol to proceed if only a threshold ($t$ out of $n$ for some $t<n/2$) of trustees participate (this, however, also reduces the number of trustees that need to collude to break the privacy, and potentially correctness, of the protocol).  
+
+The remaining question is how can Alice and Bob find trustees they assume will not collude? We have several suggestions: (1) it could be based on personal connections; (2) perhaps commercial entities would emerge with either pre-established reputations or earn their reputation over time (similar to oracle providers) and through legally enforceable terms of service; or (3) trustees could be picked at random from a large set of trustees. While (3) may not sound convincing, it is essentially same threat model as the anonymous web-browsing tool Tor which is trusted by vulnerable users (perhaps Tor also uses flavours of (1) via its the EntryGuard program). 
 
 \paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question we is whether MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{sec:arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
 
 \paragraph{Design decision: Mix and match.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluate a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an SFE/MPC protocol for the basis of Absentia, we looked for one with the following properties:
 
 \begin{enumerate}
-\item \textbf{Trustee model.} As justified above, we seek an MPC/SFE protocol that lets the input holders (\eg Alice and Bob) offload their inputs to a set of trustees for evaluation. 
+\item \textbf{Trustee model.} As justified above, we seek an MPC/SFE protocol that lets the input holders (\eg Alice and Bob) offload their inputs to a set of non-colluding trustees for evaluation. 
 \item \textbf{Publicly verifiable} (aka publicly auditable or universally verifiable). Many MPC/SFE protocols are in the semi-honest (\ie honest-but-curious) model. Some are resilient to covert or malicious adversaries. We require that not only can adversarial behaviour  be detected by the participates in the protocol, but that it can be detected by anyone (\ie the public). This allows (a) Alice and Bob to offload the computational work to the trustees and still ensure the output is correct, even if they did not directly participate, and (b) Alice and Bob can go further and offload the verification itself to someone they trust---the Ethereum network in this case.
-\item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arimatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
-\item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA siganatures) on the elliptic curve \texttt{secp256k1}. For easy of implementation, we preferred an MPC with the same cryptographic setting. 
+\item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA signatures) on the elliptic curve \texttt{secp256k1}. For easy of implementation, we prefer a SFE/MPC with the same cryptographic setting. 
+\item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arithmatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
 \end{enumerate}
 
-One MPC protocol that is sufficient in Mix and Match~\cite{JJ00}. 
+One SPF protocol to meet our purposes is Mix and Match~\cite{JJ00} and we chose it based on our familiarity with it. We are also aware that the state-of-the-art MPC protocols are based on a different paradigm---based on \emph{Beaver triples}~\cite{beaver1997commodity}---initiated by the SPDZ protocol~\cite{damgaard2012multiparty,damgaard2013practical} with many followups (\textblue{HighGear} is a recent example). While SPDZ uses lattice-based somewhat homomorphic encryption (SME), this is during a pre-computation phase and Abstentia (for now) assumes all pre-computation has been validated. SPDZ also appears amenable to a trustee model and one paper explores a publicly verifiable variant~\cite{baum2014publicly}, however since the authors do not compare themselves to Mix and Match, it would be a complete research project to determine if it is indeed faster. We note that it is not obviously categorically faster---for example, by not requiring public key operations at all: the publicly verifiable variant uses Pedersen commitments extensively.  
 
-We are not aware of an explict \emph{proof} that Mix and Match is publicly verifiable, however every step of the protocol is covered by a trustee issuing a non-interactive zero knowledge proof. In fact, it appears that even when all trustees fully collude, trustees can only break privacy (and not integrity) with the exception of one sub-protocol, as noted in ~\cite{JJ00}, called the \emph{plaintext equality test} (PET). Despite the authors' caution, many have used the PET protocol as if it is publicly verifiable (with some justification based on statistical arguments)~\cite{}. Recently it was shown the statistical arguments are not sufficient but the PET protocol can be made publicly verifiable with a simple additional check on the final output~\cite{}.
+We are not aware of an explicit \emph{proof} that Mix and Match is publicly verifiable, however every step of the protocol is covered by a trustee issuing a non-interactive zero knowledge proof and it is later assumed to be by the authors in their auction application~\cite{JJ00}. Stated a different way, it appears that even when all trustees fully collude, trustees can only break privacy (and not integrity) with the exception of one sub-protocol, as noted by the authors~\cite{JJ00}, called the \emph{plaintext equality test} (PET). Despite the caveat, many have used the PET protocol as if it is publicly verifiable (some making justifications based on statistical arguments). Recently it was shown these statistical arguments are not sufficient, but the PET protocol can be made verifiable, even when \emph{all} trustees collude, with a simple additional check on the final output~\cite{mcmurtry2020test}.
 
 
 \section{Preliminaries}
 
-\subsection{Related work}
+\section{Related work}
 \label{sec:lit}
 * Enigma~\cite{zyskind2015enigma}
 
@@ -105,8 +113,40 @@ An outsourcing protocol for secure computation that allows offline parties
 
 \subsection{Background}
 
-We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). 
+Mix and Match.
 
+\begin{mdframed}
+ 	\textbf{Mix and match}
+ 	\newline
+ 	 \newline
+ 	\textbf{Parties: } Alice, Bob, Trustee1 (who is also the manager), Trustee2 
+ 	 \newline
+ 	\textbf{Input: } Alice's ElGamal ciphertext, Bob's ElGamal ciphertext, encrypted NAND table 
+ 	\newline
+ 	\textbf{Output: } Matching value from the table based on Alice and Bob's inputs
+ 	\newline
+ 	
+	Preparation stage for mix and match are done off-chain:
+	\begin{enumerate}
+		\item Manager creates the table for NAND gate with two inputs and encrypts each cell using ElGamal. 
+		\item Manager shuffles the rows and rerandomizes the cells of the table.
+		\item Alice and Bob encrypt their respective inputs $a$ and $b$ as $[a]$ and $[b]$.
+	\end{enumerate}
+
+ 	The protocol continues as follows:
+ 	\begin{enumerate}
+ 		\item Alice and Bob deposit their ciphertexts, $[a]$ and $[b]$, into the smart contract. They also deposit enough funds into the contract. The funds will be used to compensate the work done by the trustees.
+ 		\item Trustee1 (Manager) subtracts user's (Alice or Bob) input from the cell's value.
+ 		\item Trustee1 submits blinded value and the values for zero knowledge proof (ZKP).
+ 		\item Trustee2 submits blinded value and the values for ZKP.
+ 		\item Trustee1 submits value for partial decryption and the values for ZKP.
+ 		\item Trustee2 submits value for partial decryption and the values for ZKP.
+ 		\item Trustee1 determines the matching row, partially decrypts the result and submits ZKP.
+ 		\item Trustee2  determines the matching result by partially decrypting Trustee1's result and submits ZKP.
+ 		\item Funds are transferred to the trustees.
+ 		\item Alice and Bob learn the final result.
+ 	\end{enumerate}
+\end{mdframed}
 
 
 \section{System design}
@@ -231,38 +271,7 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 	\caption{Comparison with arbitrum} 
 \end{table}
 
-\begin{mdframed}
- 	\textbf{Mix and match}
- 	\newline
- 	 \newline
- 	\textbf{Parties: } Alice, Bob, Trustee1 (who is also the manager), Trustee2 
- 	 \newline
- 	\textbf{Input: } Alice's ElGamal ciphertext, Bob's ElGamal ciphertext, encrypted NAND table 
- 	\newline
- 	\textbf{Output: } Matching value from the table based on Alice and Bob's inputs
- 	\newline
- 	
-	Preparation stage for mix and match are done off-chain:
-	\begin{enumerate}
-		\item Manager creates the table for NAND gate with two inputs and encrypts each cell using ElGamal. 
-		\item Manager shuffles the rows and rerandomizes the cells of the table.
-		\item Alice and Bob encrypt their respective inputs $a$ and $b$ as $[a]$ and $[b]$.
-	\end{enumerate}
 
- 	The protocol continues as follows:
- 	\begin{enumerate}
- 		\item Alice and Bob deposit their ciphertexts, $[a]$ and $[b]$, into the smart contract. They also deposit enough funds into the contract. The funds will be used to compensate the work done by the trustees.
- 		\item Trustee1 (Manager) subtracts user's (Alice or Bob) input from the cell's value.
- 		\item Trustee1 submits blinded value and the values for zero knowledge proof (ZKP).
- 		\item Trustee2 submits blinded value and the values for ZKP.
- 		\item Trustee1 submits value for partial decryption and the values for ZKP.
- 		\item Trustee2 submits value for partial decryption and the values for ZKP.
- 		\item Trustee1 determines the matching row, partially decrypts the result and submits ZKP.
- 		\item Trustee2  determines the matching result by partially decrypting Trustee1's result and submits ZKP.
- 		\item Funds are transferred to the trustees.
- 		\item Alice and Bob learn the final result.
- 	\end{enumerate}
-\end{mdframed}
 
 Steps $2-6$ are repeated for each input cell.
 
@@ -368,3 +377,15 @@ dispute resolution
 	\begin{call}{t}{\href{https://kovan.etherscan.io/tx/0x10788165eacbbe25066c163fa0cf7a5af07da32c05af001d0f05ad8946974c6e}{Text}}{i}{return value}
 	\end{call}
 \end{sequencediagram}
+
+
+
+\section{Discussion}
+
+\begin{itemize}
+\item Payments: fancier, contingent on who aborts, timeliness, \etc
+\item Pre-comp: validate it , have pre-built and validated circuits, \etc
+\item Implementation improvements: factory design and contract size
+\item Proxy re-encryption instead of decryption
+\item what else?
+\end{itemize}

@@ -19,6 +19,9 @@ Baum, C., Damg{\aa}rd, I., Orlandi, C.: Publicly auditable secure multi-party
   computation. In: International Conference on Security and Cryptography for
   Networks. pp. 175--196. Springer (2014)
 
+\bibitem{beaver1997commodity}
+Beaver, D.: Commodity-based cryptography. In: ACM STOC. pp. 446--455 (1997)
+
 \bibitem{bowe2020zexe}
 Bowe, S., Chiesa, A., Green, M., Miers, I., Mishra, P., Wu, H.: Zexe: Enabling
   decentralized private computation. In: 2020 IEEE Symposium on Security and
@@ -38,6 +41,10 @@ Damg{\aa}rd, I., Pastro, V., Smart, N., Zakarias, S.: Multiparty computation
 \bibitem{GMR+20}
 Gudgeon, L., Moreno-Sanchez, P., Roos, S., McCorry, P., Gervais, A.: Sok:
   Layer-two blockchain protocols. In: Financial Cryptography (2020)
+
+\bibitem{JJ00}
+Jakobsson, M., Juels, A.: Mix and match: Secure function evaluation via
+  ciphertexts. In: ASIACRYPT (2000)
 
 \bibitem{jakobsson2000mix}
 Jakobsson, M., Juels, A.: Mix and match: Secure function evaluation via
@@ -64,6 +71,10 @@ Lu, D., Yurek, T., Kulshreshtha, S., Govind, R., Kate, A., Miller, A.:
   application to anonymous communication. In: Proceedings of the 2019 ACM
   SIGSAC Conference on Computer and Communications Security. pp. 887--903
   (2019)
+
+\bibitem{mcmurtry2020test}
+McMurtry, E., Pereira, O., Teague, V.: When is a test not a proof? In: European
+  Symposium on Research in Computer Security. pp. 23--41. Springer (2020)
 
 \bibitem{sanchez2018raziel}
 S{\'a}nchez, D.C.: Raziel: Private and verifiable smart contracts on
