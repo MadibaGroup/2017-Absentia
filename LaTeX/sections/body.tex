@@ -1,4 +1,22 @@
-\section{Related work}
+% !TEX root = ../main.tex
+
+\section{Introduction}
+
+\textblue{Great opening sentence here.} Introduction and motivaton.
+
+\paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question we is whether MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
+
+\paragraph{Design decision: Mix and match.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluation a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an MPC protocol for the basis of Absentia, we looked for the following properties:
+
+\begin{enumerate}
+\item \textbf{Submit and Go.}
+\item \textbf{Publicly Verifiable.}
+\end{enumerate}
+
+\section{Preliminaries}
+
+\subsection{Related work}
+\label{sec:lit}
 * Enigma~\cite{zyskind2015enigma}
 
 uses secure multiparty computation
@@ -58,6 +76,15 @@ A use case: fair MPC
 ~\cite{baum2014publicly}
 
 ~\textbf{Mix-and-match vs SPDZ}
+
+
+
+\subsection{Background}
+
+We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). 
+
+
+
 \section{System design}
 
 ~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4

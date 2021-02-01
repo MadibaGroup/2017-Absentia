@@ -1,0 +1,66 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{andrychowicz2014secure}
+Andrychowicz, M., Dziembowski, S., Malinowski, D., Mazurek, L.: Secure
+  multiparty computations on bitcoin. In: 2014 IEEE Symposium on Security and
+  Privacy. pp. 443--458. IEEE (2014)
+
+\bibitem{baum2014publicly}
+Baum, C., Damg{\aa}rd, I., Orlandi, C.: Publicly auditable secure multi-party
+  computation. In: International Conference on Security and Cryptography for
+  Networks. pp. 175--196. Springer (2014)
+
+\bibitem{bowe2020zexe}
+Bowe, S., Chiesa, A., Green, M., Miers, I., Mishra, P., Wu, H.: Zexe: Enabling
+  decentralized private computation. In: 2020 IEEE Symposium on Security and
+  Privacy (SP). pp. 947--964. IEEE (2020)
+
+\bibitem{damgaard2013practical}
+Damg{\aa}rd, I., Keller, M., Larraia, E., Pastro, V., Scholl, P., Smart, N.P.:
+  Practical covertly secure mpc for dishonest majority--or: breaking the spdz
+  limits. In: European Symposium on Research in Computer Security. pp. 1--18.
+  Springer (2013)
+
+\bibitem{GMR+20}
+Gudgeon, L., Moreno-Sanchez, P., Roos, S., McCorry, P., Gervais, A.: Sok:
+  Layer-two blockchain protocols. In: Financial Cryptography (2020)
+
+\bibitem{jakobsson2000mix}
+Jakobsson, M., Juels, A.: Mix and match: Secure function evaluation via
+  ciphertexts. In: International Conference on the Theory and Application of
+  Cryptology and Information Security. pp. 162--177. Springer (2000)
+
+\bibitem{KGCWF18}
+Kalodner, H., Goldfeder, S., Chen, X., Weinberg, S.M., Felten, E.W.: Arbitrum:
+  Scalable, private smart contracts. In: USENIX Security (2018)
+
+\bibitem{kalodner2018arbitrum}
+Kalodner, H., Goldfeder, S., Chen, X., Weinberg, S.M., Felten, E.W.: Arbitrum:
+  Scalable, private smart contracts. In: 27th $\{$USENIX$\}$ Security Symposium
+  ($\{$USENIX$\}$ Security 18). pp. 1353--1370 (2018)
+
+\bibitem{kosba2016hawk}
+Kosba, A., Miller, A., Shi, E., Wen, Z., Papamanthou, C.: Hawk: The blockchain
+  model of cryptography and privacy-preserving smart contracts. In: 2016 IEEE
+  symposium on security and privacy (SP). pp. 839--858. IEEE (2016)
+
+\bibitem{lu2019honeybadgermpc}
+Lu, D., Yurek, T., Kulshreshtha, S., Govind, R., Kate, A., Miller, A.:
+  Honeybadgermpc and asynchromix: Practical asynchronous mpc and its
+  application to anonymous communication. In: Proceedings of the 2019 ACM
+  SIGSAC Conference on Computer and Communications Security. pp. 887--903
+  (2019)
+
+\bibitem{zyskind2015enigma}
+Zyskind, G., Nathan, O., Pentland, A.: Enigma: Decentralized computation
+  platform with guaranteed privacy. arXiv preprint arXiv:1506.03471  (2015)
+
+\bibitem{zyskind2015decentralizing}
+Zyskind, G., Nathan, O., et~al.: Decentralizing privacy: Using blockchain to
+  protect personal data. In: 2015 IEEE Security and Privacy Workshops. pp.
+  180--184. IEEE (2015)
+
+\end{thebibliography}
