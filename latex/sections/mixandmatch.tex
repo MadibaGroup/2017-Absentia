@@ -55,6 +55,7 @@ A use case: fair MPC
 * HoneybadgerMPC~\cite{lu2019honeybadgermpc}
 
 
+* SPDZ ~\cite{damgaard2013practical}
 
 ~\textbf{Mix-and-match vs SPDZ}
 \section{System design}
@@ -163,9 +164,9 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \begin{table}[]
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
-		Contract & Function  & Gas without  & Arbitrum  & Arbitrum & Input Size \\ 
-		 &   &  rollups &  Layer 1 Gas &Layer 2 Gas (arbgas)& (bytes) \\ \hline
-		\multirow{8}{*}{} 
+		 &  & ~\textbf{Ethereum} & \multicolumn{3}{c|}{~\textbf{Arbitrum}} \\ \hline
+		~\textbf{Contract }& ~\textbf{Function}  & ~\textbf{Gas}  &  ~\textbf{L1 Gas}  & ~\textbf{L2 Arbgas} & ~\textbf{Input size (bytes) }\\ \hline 
+		\multirow{6}{*}{} 
 		&  loadCiphertexts & 304668 & 7869 & 820507& 832\\  \cline{2-6}
 		& PET\_subtract & 242131 & 5469& 4789799& 640\\  \cline{2-6}
 		&  DHProve\_Trustee1Pf\_Rand& 815340 &  11488& 10972720& 832\\  \cline{2-6}
