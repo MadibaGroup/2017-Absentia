@@ -60,6 +60,11 @@ Kalodner, H., Goldfeder, S., Chen, X., Weinberg, S.M., Felten, E.W.: Arbitrum:
   Scalable, private smart contracts. In: 27th $\{$USENIX$\}$ Security Symposium
   ($\{$USENIX$\}$ Security 18). pp. 1353--1370 (2018)
 
+\bibitem{keller2018overdrive}
+Keller, M., Pastro, V., Rotaru, D.: Overdrive: Making spdz great again. In:
+  Annual International Conference on the Theory and Applications of
+  Cryptographic Techniques. pp. 158--189. Springer (2018)
+
 \bibitem{kosba2016hawk}
 Kosba, A., Miller, A., Shi, E., Wen, Z., Papamanthou, C.: Hawk: The blockchain
   model of cryptography and privacy-preserving smart contracts. In: 2016 IEEE
