@@ -140,37 +140,39 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 
 
 \begin{table}[]
-	\begin{tabular}{|l|l|l|l|}
+		\centering
+	\begin{tabular}{|l|l|r|r|}
 		\hline
 		~\textbf{Contract} & ~\textbf{Function } & ~\textbf{Gas}  & ~\textbf{Gas Cost (\$)}  \\ \hline
 		\multirow{9}{*}{}  
-		& loadFund & 28040  &1.50  \\ \cline{2-4} 
-		& checkBalances &  30359& 1.63 \\  \cline{2-4} 
-		&  loadOutputs&  300798 & 16.13 \\  \cline{2-4} 
-		&  createRow1 & 8741453 & 468.90 \\  \cline{2-4}
+		& Load Funds & 28040  &1.50  \\ \cline{2-4} 
+		& Check Balances &  30359& 1.63 \\  \cline{2-4} 
+		&  Load Outputs&  300798 & 16.13 \\  \cline{2-4} 
+		&  Create Row1 & 8741453 & 468.90 \\  \cline{2-4}
 		Mixmatch.sol	&  matchingRow & 37547 &2.01  \\  \cline{2-4}
-		& matchingValue &  40868&2.19 \\  \cline{2-4}
-		&  createFinalDecryption&  4430611& 237.66 \\  \cline{2-4}
-		& sendexcessfunds &  41110& 2.21 \\  \cline{2-4}
-		& withdraw &  39221& 2.10 \\   \hline
+		& Find Matching Value &  40868&2.19 \\  \cline{2-4}
+		&  Create Final Decryption&  4430611& 237.66 \\  \cline{2-4}
+		& Send Excess Funds &  41110& 2.21 \\  \cline{2-4}
+		& Withdraw Fund&  39221& 2.10 \\   \hline
 		\multirow{8}{*}{} 
-		&  loadCiphertexts & 304668 & 16.34 \\  \cline{2-4}
-		& PET\_subtract & 242131 & 12.99\\  \cline{2-4}
-		&  DHProve\_Trustee1Pf\_Rand& 815340 &  43.74\\  \cline{2-4}
-		PET.sol	&  DHProve\_Trustee2Pf\_Rand& 393561 &21.11  \\  \cline{2-4}
-		&  DHProve\_Trustee1Pf\_PartialDec& 364298 & 19.54\\  \cline{2-4}
-		& DHProve\_Trustee2Pf\_PartialDec & 363612 & 19.50 \\  \cline{2-4}
-		& FullDecryption  &  107086& 5.74 \\  \cline{2-4}
-		&  loadFinalCiphertext& 173945 & 9.33\\ \hline
+		&  Load Ciphertexts & 304668 & 16.34 \\  \cline{2-4}
+		& Subtraction & 242131 & 12.99\\  \cline{2-4}
+		&  T1 Randomization ZKP& 815340 &  43.74\\  \cline{2-4}
+		PET.sol	&  T2 Randomization ZKP& 393561 &21.11  \\  \cline{2-4}
+		& T1 Partial Dec ZKP& 364298 & 19.54\\  \cline{2-4}
+		& T2 Partial Dec ZKP & 363612 & 19.50 \\  \cline{2-4}
+		& Full Decryption  &  107086& 5.74 \\  \cline{2-4}
+		&  Load Final Ciphertexts& 173945 & 9.33\\ \hline
 	\end{tabular}
 	\caption{Table description!! (Gas on Dec 01, 2020 is 0.000000087210450983 ETH)} \label{tab:gas}
 \end{table}
 
 
 \begin{table}[]
-	\begin{tabular}{|l|l|}
+	\centering
+	\begin{tabular}{|l|r|}
 		\hline
-		~\textbf{code}	& ~\textbf{Size(bytes)}  \\ \hline
+		~\textbf{Code}	& ~\textbf{Size(bytes)}  \\ \hline
 		bytecode	& 27178  \\ \hline
 		deployed	& 26774  \\ \hline
 		initialisation and constructor code 	& 404 \\ \hline
@@ -179,7 +181,8 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{table}
 
 \begin{table}[]
-	\begin{tabular}{|l|l|l|l|l|}
+		\centering
+	\begin{tabular}{|l|r|r|r|r|}
 		\hline
 		& ~\textbf{Alice} &  ~\textbf{Bob} & ~\textbf{Trustee1*}  & ~\textbf{Trustee2}  \\ \hline
 		Number of Transactions	& 5 &5  &44  &17  \\ \hline
@@ -190,9 +193,10 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{table}
 
 \begin{table}[]
-	\begin{tabular}{|l|l|}
+		\centering
+	\begin{tabular}{|l|r|}
 	\hline
-	~\textbf{setting}	& ~\textbf{Total gas}  \\ \hline
+	~\textbf{Setting}	& ~\textbf{Total gas}  \\ \hline
 	1 gate, 2 trustees	& 61867023  \\ \hline
 	2 gate, 2 trustees	&  121240622 \\ \hline
 	1 gate, 3 trustees	& 68288019 \\ \hline
@@ -202,6 +206,7 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 
 
 \begin{table}[]
+		\centering
 	\begin{tabular}{|l|r|r|r|r|r|r|r|}
 		\hline
 		&    \multicolumn{2}{c|}{~\textbf{Ethereum}} & \multicolumn{5}{c|}{~\textbf{Arbitrum}} \\ \hline
