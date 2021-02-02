@@ -23,6 +23,7 @@ The remaining question is how can Alice and Bob find trustees they assume will n
 \begin{enumerate}
 \item \textbf{Trustee model.} As justified above, we seek an MPC/SFE protocol that lets the input holders (\eg Alice and Bob) offload their inputs to a set of non-colluding trustees for evaluation. 
 \item \textbf{Publicly verifiable} (aka publicly auditable or universally verifiable). Many MPC/SFE protocols are in the semi-honest (\ie honest-but-curious) model. Some are resilient to covert or malicious adversaries. We require that not only can adversarial behaviour  be detected by the participates in the protocol, but that it can be detected by anyone (\ie the public). This allows (a) Alice and Bob to offload the computational work to the trustees and still ensure the output is correct, even if they did not directly participate, and (b) Alice and Bob can go further and offload the verification itself to someone they trust---the Ethereum network in this case.
+\item \textbf{Identifiable aborts.} If the protocol does not reach completion, anyone can establish which trustee aborted.
 \item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA signatures) on the elliptic curve \texttt{secp256k1}. For easy of implementation, we prefer a SFE/MPC with the same cryptographic setting. 
 \item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arithmatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
 \end{enumerate}
@@ -34,16 +35,65 @@ We are not aware of an explicit \emph{proof} that Mix and Match is publicly veri
 
 \section{Preliminaries}
 
-\section{Related work}
+\subsection{Related work}
 \label{sec:lit}
 
-The blockchain literature has explored SFE and MPC in several regards. Enigma~\cite{zyskind2015enigma}, perhaps the closest to Abstentia, offers stateful MPC as a service. The academic proposal was for its own blockchain and, now as a commercial project, the emphasis is more on providing generic smart contracts with privacy. While it does not run on Ethereum, a bridge contract is available to allow token transfers to their Cosmos/Tendermint-based chain. Abstentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Abstentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper but is based on succinct zero knowledge~\cite{kosba2016hawk}. Fair MPC is described as an application of Hawk but not implemented.  
+The blockchain literature has explored SFE and MPC in several regards. Perhaps the closest to Abstentia is Enigma~\cite{zyskind2015enigma} which offers stateful MPC as a service. The original academic proposal utilizes a custom blockchain. Now as a commercial project, the emphasis is on providing generic smart contracts with privacy. Engima runs on a Cosmos/Tendermint-based chain, which an Ethereum bridge contract that allows swapping crypto-assets. Abstentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Abstentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper for contracts~\cite{kosba2016hawk}. It is based on succinct zero knowledge and fair MPC is described as an application of Hawk but not implemented.  
 
 %HoneybadgerMPC~\cite{lu2019honeybadgermpc} uses a consensus algorithm to  ???
 
-The literature has also explored moving computation off-chain while not losing privacy or correctness, however from the perspective a single entity's secret data (\ie verifiable computing as opposed to SFE/MPC). Examples include Zexe~\cite{bowe2020zexe}, ZkVM~\cite{zkvm}, and Raziel~\cite{sanchez2018raziel}. Another research direction, initiated by Andrychowicz \etal~\cite{andrychowicz2014secure}, explores how blockchain technologies can support an off-chain MPC to provide fairness~\cite{kuma}. By contrast, Abstentia is performing the SFE on the blockchain. Closely related to SFE/MPC are zero knowledge proofs, whose uses in blockchain are now too prolific to adequately summerize here.
+The literature has also explored moving computation off-chain while not losing privacy or correctness, however from the perspective a single entity's secret data (\ie verifiable computing as opposed to SFE/MPC). Examples include Zexe~\cite{bowe2020zexe}, ZkVM~\cite{zkvm}, and Raziel~\cite{sanchez2018raziel}. Another research direction, initiated by Andrychowicz \etal~\cite{andrychowicz2014secure}, explores how blockchain technologies can support an off-chain MPC to provide fairness. By contrast, Abstentia is performing the SFE on the blockchain. Closely related to SFE/MPC are zero knowledge proofs, whose uses in blockchain are now too prolific to adequately summerize here.
 
 \subsection{Background}
+
+We provide a basic overview of the Mix and Match protocol for secure function evaluation (SFE), while referring the reader to the original paper for the full details~\cite{JJ00}. Mix and Match uses a partially homomorphic encryption scheme; we instantiate it with the additive exponential Elgamal~\cite{CGS97}. We implement it over the elliptic curve \texttt{secp256k1} which is used natively by Ethereum (this results in gas savings).
+
+\paragraph{Mix and Match: Pre-computation.} 
+
+In a pre-computation stage, the following is tasks are completed. First, a set of $n$ trustees, identified by public keys, are chosen as well as a threshold of trustees needed to complete the protocol. We implement the simplest case: 2-out-of-2 (we call this distributed as opposed to threshold). Next, the trustees use a distributed key generation (DKG) protocol for creating $n$ shares of the decryption key, which can used for threshold $t-out-of-n$ decryption, as well as a single joint public key. Exponential Elgamal supports DKG and threshold decryption~\cite{Ped91a}.
+
+In Mix and Match, a circuit of the function to be evaluated is produced using multi-input and multi-output lookup tables. We evaluate a single binary NAND gate (a universal gate that can create any circuit) which corresponds to a lookup table with two binary inputs (one from Alice and one from Bob) and a single binary output. During a pre-computation stage, the circuit for the function is established as a sequence of lookup tables (the output from one table can be used as an input to another). Each element of each lookup table is individually encrypted under the trustees' public key (we denote an encryption of $x$ as $\EncB{x}$). 
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  A			& 	B			& 	Out   			\\ \hline
+  $\EncB{0}$ 	&	$\EncB{0}$ 	& 	$\EncB{1}$ 	\\ \hline
+  $\EncB{1}$ 	&	$\EncB{0}$ 	&  	$\EncB{1}$ 	\\ \hline
+  $\EncB{0}$ 	&	$\EncB{1}$ 	& 	$\EncB{1}$ 	\\ \hline
+  $\EncB{1}$ 	&	$\EncB{1}$ 	&  	$\EncB{0}$ 	\\ \hline
+\end{tabular}
+\end{center}
+
+The encrypted table is then permuted row-wise. Each trustee mixes the rows, rerandomizes each ciphertext, and proves in zero knowledge that the result is correct. 
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  A			& 	B			& 	Out   			\\ \hline
+  $\EncB{0}$ 	&	$\EncB{1}$ 	& 	$\EncB{1}$ 	\\ \hline
+  $\EncB{1}$ 	&	$\EncB{0}$ 	&  	$\EncB{1}$ 	\\ \hline
+  $\EncB{1}$ 	&	$\EncB{1}$ 	&  	$\EncB{0}$ 	\\ \hline
+  $\EncB{0}$ 	&	$\EncB{0}$ 	& 	$\EncB{1}$ 	\\ \hline
+\end{tabular}
+\end{center}
+
+Complete circuits of such tables can be pre-computed by the trustees before Alice and Bob provide their inputs. Practically speaking, if sets of trustees were established, they could prepare circuits for commonly requested functions and post them publicly. When Alice and Bob decide to do an MPC, they can choose the pre-computed circuit (produced by a specific set of trustees). For the purposes of this paper, we assume circuits have been pre-computed and verified. In the future we may extend Abstentia to accept a circuit and complete set of proofs to verify its correct construction, but for this paper, we concentrate on building a verifier for the online phase.
+
+\paragraph{Plaintext Equality Test (PET).} Let $\tuple{\EncB{a},\EncB{b}}$ denote two exponential Elgamal ciphertexts; encryptions of $a$ and $b$ respectively. The trustees will first compute $\EncB{z}=\EncB{a-b}$ using the additively homomorphic property. If the values are the same, $z=0$; otherwise $z\neq 0$. Each trustee will choose a random $r_i\neq0$, compute $\EncB{z_i}=\EncB{r_i*z_{i-1}}$ and prove correctness in zero knowledge. The resultant $\EncB{\hat{z}}=\EncB{\prod r_i*z}$ will still be $\EncB{0}$ when $a=b$ and will encrypt a randomly distributed non-zero integer otherwise. (The original proposal~\cite{JJ00} lets each trustee blind without using the result from the previous trustee---this adds asynchronicity but requires a critical security correction~\cite{mcmurtry2020test}). In the final step, the trustees decrypt and reveal $\hat{z}$.
+
+\paragraph{Mix and Match: Online phase.} The trustees can begin with Alice's input $\EncB{a}$ and they compute a PET between $\EncB{a}$ and ciphertext in the column corresponding to Alice's input. They do the same for Bob. They locate the row that returns true for every input column. The output of this row can then be (1) transferred to the next gate, (2) decrypted publicly if it is a final output, or (3) proxy re-encrypted for Alice (and/or Bob) --- meaning it is obliviously and verifiably changed by the trustees from an encryption under the trustees' joint public key to an encryption under Alice's. For simplicity in Abstentia, we implement (2). We illustrate for the previous example and $a=1$ and $b=0$:
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+  \hline
+  A			& 	B			& 	Out   			\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	& 	 	\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	&  	$\EncB{1}$  	\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	&  	 	\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	& 	 	\\ \hline
+\end{tabular}
+\end{center}
 
 Mix and Match.
 
@@ -60,41 +110,12 @@ The participants should decide on a function and its circuit representation befo
 
 Mix and match protocol guarantees that the participants only learn the output of their jointly chosen function and nothing else.
 
-\begin{mdframed}
- 	\textbf{Mix and match}
- 	\newline
- 	 \newline
- 	\textbf{Parties: } Alice, Bob, Trustee1 (who is also the manager), Trustee2 
- 	 \newline
- 	\textbf{Input: } Alice's ElGamal ciphertext, Bob's ElGamal ciphertext, encrypted NAND table 
- 	\newline
- 	\textbf{Output: } Matching value from the table based on Alice and Bob's inputs
- 	\newline
- 	
-	Preparation stage for mix and match are done off-chain:
-	\begin{enumerate}
-		\item Manager creates the table for NAND gate with two inputs and encrypts each cell using ElGamal. 
-		\item Manager shuffles the rows and rerandomizes the cells of the table.
-		\item Alice and Bob encrypt their respective inputs $a$ and $b$ as $[a]$ and $[b]$.
-	\end{enumerate}
-
- 	The protocol continues as follows:
- 	\begin{enumerate}
- 		\item Alice and Bob deposit their ciphertexts, $[a]$ and $[b]$, into the smart contract. They also deposit enough funds into the contract. The funds will be used to compensate the work done by the trustees.
- 		\item Trustee1 (Manager) subtracts user's (Alice or Bob) input from the cell's value.
- 		\item Trustee1 submits blinded value and the values for zero knowledge proof (ZKP).
- 		\item Trustee2 submits blinded value and the values for ZKP.
- 		\item Trustee1 submits value for partial decryption and the values for ZKP.
- 		\item Trustee2 submits value for partial decryption and the values for ZKP.
- 		\item Trustee1 determines the matching row, partially decrypts the result and submits ZKP.
- 		\item Trustee2  determines the matching result by partially decrypting Trustee1's result and submits ZKP.
- 		\item Funds are transferred to the trustees.
- 		\item Alice and Bob learn the final result.
- 	\end{enumerate}
-\end{mdframed}
 
 
-\section{System design}
+
+
+
+\section{Abstentia: system design}
 \label{sec:system}
 
 ~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4
