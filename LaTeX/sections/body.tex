@@ -6,13 +6,13 @@ Consider the traditional multi-party computational setting with a twist: Alice a
 
 We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). Can these technologies help? In theory? In practice? We seek to answer this question through direct experimentation. The abstract above builds the argument for why blockchain can help: (1) it provides a integral point of coordination where trustees can post and track progress on the evaluation; (2) it provides an in-band solution for paying the trustees (in either a cryptocurrency like ETH or in a stablecoin pegged to the value of governmental currency like the USD) in a way that is contingent on their performance; and (3) it can server as the public verifier and can reject any protocol proof that is not correct. When Alice and Bob retrieve the result (whether in plaintext or individually encrypted under their keys), they know it must be correct, otherwise it would not be there waiting for them.
 
-Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimist roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Abstentia substantially more practical (with room for further improvement).
+Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimist roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Absentia substantially more practical (with room for further improvement).
  
 \subsection{Key design decisions}
 
-Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Abstentia provides; and reserve the term multiparty computation (MPC) for a more setting where stateful computations might be performed over time.
+Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Absentia provides; and reserve the term multiparty computation (MPC) for a more setting where stateful computations might be performed over time.
 
-\paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We assume the number of trustees ($n$) can be chosen independently of the number of inputs. In Abstentia, we simply our implementation to only support rubostness in the case that all trustees ($n$-out-of-$n$) participate, however this could modified to allow the protocol to proceed if only a threshold ($t$ out of $n$ for some $t<n/2$) of trustees participate (this, however, also reduces the number of trustees that need to collude to break the privacy, and potentially correctness, of the protocol).  
+\paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We assume the number of trustees ($n$) can be chosen independently of the number of inputs. In Absentia, we simply our implementation to only support rubostness in the case that all trustees ($n$-out-of-$n$) participate, however this could modified to allow the protocol to proceed if only a threshold ($t$ out of $n$ for some $t<n/2$) of trustees participate (this, however, also reduces the number of trustees that need to collude to break the privacy, and potentially correctness, of the protocol).  
 
 The remaining question is how can Alice and Bob find trustees they assume will not collude? We have several suggestions: (1) it could be based on personal connections; (2) perhaps commercial entities would emerge with either pre-established reputations or earn their reputation over time (similar to oracle providers) and through legally enforceable terms of service; or (3) trustees could be picked at random from a large set of trustees. While (3) may not sound convincing, it is essentially same threat model as the anonymous web-browsing tool Tor which is trusted by vulnerable users (perhaps Tor also uses flavours of (1) via its the EntryGuard program). 
 
@@ -28,7 +28,7 @@ The remaining question is how can Alice and Bob find trustees they assume will n
 \item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arithmatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
 \end{enumerate}
 
-One SPF protocol to meet our purposes is Mix and Match~\cite{JJ00} and we chose it based on our familiarity with it. We are also aware that the state-of-the-art MPC protocols are based on a different paradigm---based on \emph{Beaver triples}~\cite{beaver1997commodity}---initiated by the SPDZ protocol~\cite{damgaard2012multiparty,damgaard2013practical} with many followups (HighGear is a recent example~\cite{keller2018overdrive}). While SPDZ uses lattice-based somewhat homomorphic encryption (SME), this is during a pre-computation phase and Abstentia (for now) assumes all pre-computation has been validated. SPDZ also appears amenable to a trustee model and one paper explores a publicly verifiable variant~\cite{baum2014publicly}, however since the authors do not compare themselves to Mix and Match, it would be a complete research project to determine if it is indeed faster. We note that it is not obviously categorically faster---for example, by not requiring public key operations at all: the publicly verifiable variant uses Pedersen commitments extensively.  
+One SPF protocol to meet our purposes is Mix and Match~\cite{JJ00} and we chose it based on our familiarity with it. We are also aware that the state-of-the-art MPC protocols are based on a different paradigm---based on \emph{Beaver triples}~\cite{beaver1997commodity}---initiated by the SPDZ protocol~\cite{damgaard2012multiparty,damgaard2013practical} with many followups (HighGear is a recent example~\cite{keller2018overdrive}). While SPDZ uses lattice-based somewhat homomorphic encryption (SME), this is during a pre-computation phase and Absentia (for now) assumes all pre-computation has been validated. SPDZ also appears amenable to a trustee model and one paper explores a publicly verifiable variant~\cite{baum2014publicly}, however since the authors do not compare themselves to Mix and Match, it would be a complete research project to determine if it is indeed faster. We note that it is not obviously categorically faster---for example, by not requiring public key operations at all: the publicly verifiable variant uses Pedersen commitments extensively.  
 
 We are not aware of an explicit \emph{proof} that Mix and Match is publicly verifiable, however every step of the protocol is covered by a trustee issuing a non-interactive zero knowledge proof and it is later assumed to be by the authors in their auction application~\cite{JJ00}. Stated a different way, it appears that even when all trustees fully collude, trustees can only break privacy (and not integrity) with the exception of one sub-protocol, as noted by the authors~\cite{JJ00}, called the \emph{plaintext equality test} (PET). Despite the caveat, many have used the PET protocol as if it is publicly verifiable (some making justifications based on statistical arguments). Recently it was shown these statistical arguments are not sufficient, but the PET protocol can be made verifiable, even when \emph{all} trustees collude, with a simple additional check on the final output~\cite{mcmurtry2020test}.
 
@@ -42,7 +42,12 @@ The blockchain literature has explored SFE and MPC in several regards. Perhaps t
 
 %HoneybadgerMPC~\cite{lu2019honeybadgermpc} uses a consensus algorithm to  ???
 
+%~\cite{kiayias2016fair}
+
 The literature has also explored moving computation off-chain while not losing privacy or correctness, however from the perspective a single entity's secret data (\ie verifiable computing as opposed to SFE/MPC). Examples include Zexe~\cite{bowe2020zexe}, ZkVM~\cite{zkvm}, and Raziel~\cite{sanchez2018raziel}. Another research direction, initiated by Andrychowicz \etal~\cite{andrychowicz2014secure}, explores how blockchain technologies can support an off-chain MPC to provide fairness. By contrast, Abstentia is performing the SFE on the blockchain. Closely related to SFE/MPC are zero knowledge proofs, whose uses in blockchain are now too prolific to adequately summerize here.
+
+The blockchain literature has explored SFE and MPC in several regards. Enigma~\cite{zyskind2015enigma}, perhaps the closest to Absentia, offers stateful MPC as a service. The academic proposal was for its own blockchain and, now as a commercial project, the emphasis is more on providing generic smart contracts with privacy. While it does not run on Ethereum, a bridge contract is available to allow token transfers to their Cosmos/Tendermint-based chain. Absentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Absentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper but is based on succinct zero knowledge~\cite{kosba2016hawk}. Fair MPC is described as an application of Hawk but not implemented.  
+
 
 \subsection{Background}
 
@@ -159,37 +164,39 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 
 
 \begin{table}[]
-	\begin{tabular}{|l|l|l|l|}
+		\centering
+	\begin{tabular}{|l|l|r|r|}
 		\hline
 		~\textbf{Contract} & ~\textbf{Function } & ~\textbf{Gas}  & ~\textbf{Gas Cost (\$)}  \\ \hline
 		\multirow{9}{*}{}  
-		& loadFund & 28040  &1.50  \\ \cline{2-4} 
-		& checkBalances &  30359& 1.63 \\  \cline{2-4} 
-		&  loadOutputs&  300798 & 16.13 \\  \cline{2-4} 
-		&  createRow1 & 8741453 & 468.90 \\  \cline{2-4}
+		& Load Funds & 28040  &1.50  \\ \cline{2-4} 
+		& Check Balances &  30359& 1.63 \\  \cline{2-4} 
+		&  Load Outputs&  300798 & 16.13 \\  \cline{2-4} 
+		&  Create Row1 & 8741453 & 468.90 \\  \cline{2-4}
 		Mixmatch.sol	&  matchingRow & 37547 &2.01  \\  \cline{2-4}
-		& matchingValue &  40868&2.19 \\  \cline{2-4}
-		&  createFinalDecryption&  4430611& 237.66 \\  \cline{2-4}
-		& sendexcessfunds &  41110& 2.21 \\  \cline{2-4}
-		& withdraw &  39221& 2.10 \\   \hline
+		& Find Matching Value &  40868&2.19 \\  \cline{2-4}
+		&  Create Final Decryption&  4430611& 237.66 \\  \cline{2-4}
+		& Send Excess Funds &  41110& 2.21 \\  \cline{2-4}
+		& Withdraw Fund&  39221& 2.10 \\   \hline
 		\multirow{8}{*}{} 
-		&  loadCiphertexts & 304668 & 16.34 \\  \cline{2-4}
-		& PET\_subtract & 242131 & 12.99\\  \cline{2-4}
-		&  DHProve\_Trustee1Pf\_Rand& 815340 &  43.74\\  \cline{2-4}
-		PET.sol	&  DHProve\_Trustee2Pf\_Rand& 393561 &21.11  \\  \cline{2-4}
-		&  DHProve\_Trustee1Pf\_PartialDec& 364298 & 19.54\\  \cline{2-4}
-		& DHProve\_Trustee2Pf\_PartialDec & 363612 & 19.50 \\  \cline{2-4}
-		& FullDecryption  &  107086& 5.74 \\  \cline{2-4}
-		&  loadFinalCiphertext& 173945 & 9.33\\ \hline
+		&  Load Ciphertexts & 304668 & 16.34 \\  \cline{2-4}
+		& Subtraction & 242131 & 12.99\\  \cline{2-4}
+		&  T1 Randomization ZKP& 815340 &  43.74\\  \cline{2-4}
+		PET.sol	&  T2 Randomization ZKP& 393561 &21.11  \\  \cline{2-4}
+		& T1 Partial Dec ZKP& 364298 & 19.54\\  \cline{2-4}
+		& T2 Partial Dec ZKP & 363612 & 19.50 \\  \cline{2-4}
+		& Full Decryption  &  107086& 5.74 \\  \cline{2-4}
+		&  Load Final Ciphertexts& 173945 & 9.33\\ \hline
 	\end{tabular}
 	\caption{Table description!! (Gas on Dec 01, 2020 is 0.000000087210450983 ETH)} \label{tab:gas}
 \end{table}
 
 
 \begin{table}[]
-	\begin{tabular}{|l|l|}
+	\centering
+	\begin{tabular}{|l|r|}
 		\hline
-		~\textbf{code}	& ~\textbf{Size(bytes)}  \\ \hline
+		~\textbf{Code}	& ~\textbf{Size(bytes)}  \\ \hline
 		bytecode	& 27178  \\ \hline
 		deployed	& 26774  \\ \hline
 		initialisation and constructor code 	& 404 \\ \hline
@@ -198,7 +205,8 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{table}
 
 \begin{table}[]
-	\begin{tabular}{|l|l|l|l|l|}
+		\centering
+	\begin{tabular}{|l|r|r|r|r|}
 		\hline
 		& ~\textbf{Alice} &  ~\textbf{Bob} & ~\textbf{Trustee1*}  & ~\textbf{Trustee2}  \\ \hline
 		Number of Transactions	& 5 &5  &44  &17  \\ \hline
@@ -209,9 +217,10 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{table}
 
 \begin{table}[]
-	\begin{tabular}{|l|l|}
+		\centering
+	\begin{tabular}{|l|r|}
 	\hline
-	~\textbf{setting}	& ~\textbf{Total gas}  \\ \hline
+	~\textbf{Setting}	& ~\textbf{Total gas}  \\ \hline
 	1 gate, 2 trustees	& 61867023  \\ \hline
 	2 gate, 2 trustees	&  121240622 \\ \hline
 	1 gate, 3 trustees	& 68288019 \\ \hline
@@ -221,7 +230,8 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 
 
 \begin{table}[]
-	\begin{tabular}{|l|l|l|l|l|l|l|l|}
+		\centering
+	\begin{tabular}{|l|r|r|r|r|r|r|r|}
 		\hline
 		&    \multicolumn{2}{c|}{~\textbf{Ethereum}} & \multicolumn{5}{c|}{~\textbf{Arbitrum}} \\ \hline
 	   ~\textbf{Function}  &~\textbf{Tx} &~\textbf{Gas}   & ~\textbf{ L1} & ~\textbf{L1}  & ~\textbf{L2} &~\textbf{L2}& ~\textbf{Input Size} \\ 
@@ -247,6 +257,14 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 	\end{tabular}
 	\caption{Comparison with arbitrum (T1: Trustee1, T2: Trustee2)} 
 \end{table}
+
+
+\begin{figure}[h]
+	\includegraphics[width=15cm]{figures/diagram}
+	\caption{figure}
+	\centering
+\end{figure}
+
 %\begin{table}[]
 %	\begin{tabular}{|l|l|l|l|l|l|}
 %		\hline

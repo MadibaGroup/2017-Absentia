@@ -3,7 +3,7 @@ sequenceDiagram
 	autonumber
    	participant A as Alice
     participant B as Bob
-    participant D as Abstentia DApp
+    participant D as Absentia DApp
     participant D2 as PET Sub-DApp
     participant T1 as Trustee 1*
 		participant T2 as Trustee 2
