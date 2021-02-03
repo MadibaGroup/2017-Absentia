@@ -6,42 +6,42 @@ Database file #1: bib/absentia.bib
 Database file #2: bib/pulp.bib
 You've used 19 entries,
             2850 wiz_defined-function locations,
-            699 strings with 7738 characters,
-and the built_in function-call counts, 11060 in all, are:
-= -- 926
-> -- 373
-< -- 10
-+ -- 155
-- -- 134
-* -- 660
-:= -- 1438
-add.period$ -- 36
+            688 strings with 7215 characters,
+and the built_in function-call counts, 9131 in all, are:
+= -- 673
+> -- 363
+< -- 2
++ -- 151
+- -- 130
+* -- 534
+:= -- 1265
+add.period$ -- 21
 call.type$ -- 19
-change.case$ -- 157
+change.case$ -- 154
 chr.to.int$ -- 0
 cite$ -- 19
-duplicate$ -- 967
-empty$ -- 1028
-format.name$ -- 149
-if$ -- 2442
+duplicate$ -- 854
+empty$ -- 871
+format.name$ -- 145
+if$ -- 1932
 int.to.chr$ -- 0
 int.to.str$ -- 19
-missing$ -- 190
+missing$ -- 182
 newline$ -- 63
 num.names$ -- 38
-pop$ -- 421
+pop$ -- 423
 preamble$ -- 1
-purify$ -- 105
+purify$ -- 102
 quote$ -- 0
-skip$ -- 288
+skip$ -- 191
 stack$ -- 0
-substring$ -- 566
-swap$ -- 468
-text.length$ -- 10
+substring$ -- 281
+swap$ -- 359
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 76
 warning$ -- 0
-while$ -- 87
+while$ -- 60
 width$ -- 21
-write$ -- 194
+write$ -- 180
