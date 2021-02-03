@@ -124,8 +124,8 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 \section{Absentia: system design}
 \label{sec:system}
 
-\begin{figure}[h]
-	\includegraphics[width=1\textwidth]{figures/abstentia.pdf}
+\begin{figure}[t]
+	\includegraphics[width=1\textwidth]{figures/absentia.pdf}
 	\caption{System overview}
 	\centering
 	\label{fig:system}
@@ -133,22 +133,27 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-\paragraph{High level flow.} Figure 1. Participants. What they do. Emphasize it just verification and not actual computation. 
+\paragraph{High level flow.} Figure 1. Participants. What they do. Emphasize it just verification and not actual computation. Relate it to Mix and Match as explained above. 
 
-The system is composed of two smart contracts and a library to perform elliptic curve operations. Figure~\ref{fig:system} shows the interaction between the participants and the DApps. At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees at the end of the protocol. They can deposit money any time they want during the protocol. They also load their ciphertexts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Trustee 1 is designated as the manager. 
+The system is composed of a smart contract, called XXX, and a sub-module called XXX.  two smart contracts. Figure~\ref{fig:system} shows the interaction between the participants and the DApps. At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees at the end of the protocol. They can deposit money any time they want during the protocol. They also load their ciphertexts. 
 
-% ~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}} is used to prevent reentrancy attack.
+ Trustee 1 is designated as the manager -> say more.
 
-Funds are transferred tot the trustees at the end of the protocol, after thay determined the final output. In another possible design, trustees can be paid at each step they performed towards reaching the final output.
 Trustee 1 is responsible for creating the PET contracts by calling create row function and loading the output values for each row at the beginning of the protocol. For each PET, Trustee 1 performs the subtraction. Again for each PET, both Trustee 1 and Trustee 2 proves in zero knowledge that the randomization of the subtraction result is correct and the partial decryption is done correctly. Trustee 1 fully decrypts the result of the subtraction at the end of each PET. After 8 PETs are performed, Trustee 1 finds the matching row and the corresponding encrypted value. Trustee 1 and Trustee 2 partially decrypt and prove in zero knowledge again to obtain the decrypted result.
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \paragraph{Payments.} What we do for now. Pointer to discussion section for other options. 
 
+Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Funds are transferred tot the trustees at the end of the protocol, after thay determined the final output. In another possible design, trustees can be paid at each step they performed towards reaching the final output.
+
+% ~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}} is used to prevent reentrancy attack.
+
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \paragraph{Code layout.} Details of testing platform (solidity, \etc). Link to Github. Mathematica is doing what? Solidity is doing what? On Ethereum: Library (why?). PET as module. Factory design (why?) 
+
+a library to perform elliptic curve operations. 
 
 ~\textcolor{red}{TO-DO:}
 The system is first implemented in Mathematica to have test vectors for the Solidity implementation. For our example, we used AND gate and there are two trustees that perform the computations. One of the trustees is designated as the manager who is responsible for creating and encrypting the table and finding the matching value at the end of the protocol.
@@ -197,6 +202,13 @@ Table~\ref{tab:settings} compares how the gas costs differ at different settings
 
 \section{Design variant on layer 2 }
 \label{sec:arb}
+
+\begin{figure}[t]
+	\includegraphics[width=1\textwidth]{figures/arbitrum.pdf}
+	\caption{System overview}
+	\centering
+	\label{fig:system}
+\end{figure}
 
 
 ~\subsection{Arbitrum}

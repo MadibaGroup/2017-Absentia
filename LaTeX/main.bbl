@@ -50,11 +50,6 @@ Gudgeon, L., Moreno-Sanchez, P., Roos, S., McCorry, P., Gervais, A.: Sok:
 Jakobsson, M., Juels, A.: Mix and match: Secure function evaluation via
   ciphertexts. In: ASIACRYPT (2000)
 
-\bibitem{jakobsson2000mix}
-Jakobsson, M., Juels, A.: Mix and match: Secure function evaluation via
-  ciphertexts. In: International Conference on the Theory and Application of
-  Cryptology and Information Security. pp. 162--177. Springer (2000)
-
 \bibitem{KGCWF18}
 Kalodner, H., Goldfeder, S., Chen, X., Weinberg, S.M., Felten, E.W.: Arbitrum:
   Scalable, private smart contracts. In: USENIX Security (2018)
