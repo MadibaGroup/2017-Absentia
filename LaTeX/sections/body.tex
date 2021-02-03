@@ -87,41 +87,29 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 
 \paragraph{Plaintext Equality Test (PET).} Let $\tuple{\EncB{a},\EncB{b}}$ denote two exponential Elgamal ciphertexts; encryptions of $a$ and $b$ respectively. The trustees will first compute $\EncB{z}=\EncB{a-b}$ using the additively homomorphic property. If the values are the same, $z=0$; otherwise $z\neq 0$. Each trustee will choose a random $r_i\neq0$, compute $\EncB{z_i}=\EncB{r_i*z_{i-1}}$ and prove correctness in zero knowledge. The resultant $\EncB{\hat{z}}=\EncB{\prod r_i*z}$ will still be $\EncB{0}$ when $a=b$ and will encrypt a randomly distributed non-zero integer otherwise. (The original proposal~\cite{JJ00} lets each trustee blind without using the result from the previous trustee---this adds asynchronicity but requires a critical security correction~\cite{mcmurtry2020test}). In the final step, the trustees decrypt and reveal $\hat{z}$.
 
-\paragraph{Mix and Match: Online phase.} The trustees can begin with Alice's input $\EncB{a}$ and they compute a PET between $\EncB{a}$ and ciphertext in the column corresponding to Alice's input. They do the same for Bob. They locate the row that returns true for every input column. The output of this row can then be (1) transferred to the next gate, (2) decrypted publicly if it is a final output, or (3) proxy re-encrypted for Alice (and/or Bob) --- meaning it is obliviously and verifiably changed by the trustees from an encryption under the trustees' joint public key to an encryption under Alice's. For simplicity in Abstentia, we implement (2). We illustrate for the previous example and $a=1$ and $b=0$:
+\paragraph{Mix and Match: Online phase.} The trustees can begin with Alice's input $\EncB{a}$ and they compute a PET between $\EncB{a}$ and ciphertext in the column corresponding to Alice's input. They do the same for Bob. They locate the row that returns true for every input column. The output(s) of this row can then be (1) transferred as an input to the next gate, (2) decrypted publicly if it is a final output, or (3) proxy re-encrypted for Alice (and/or Bob) --- meaning it is obliviously and verifiably changed by the trustees from an encryption under the trustees' joint public key to an encryption under Alice's. For simplicity in Abstentia, we implement (2). We illustrate for the previous example and $a=1$ and $b=0$:
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
   \hline
   A			& 	B			& 	Out   			\\ \hline
-  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	& 	 	\\ \hline
-  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	&  	$\EncB{1}$  	\\ \hline
-  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	&  	 	\\ \hline
-  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	& 	 	\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	& 	 		\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	&  $\EncB{1}$  	\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{1}) = \mathtt{T}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{1}) = \mathtt{F}$ 	&  	 		\\ \hline
+  $\mathsf{PET}(\EncB{a},\EncB{0}) = \mathtt{F}$ 	&	$\mathsf{PET}(\EncB{b},\EncB{0}) = \mathtt{T}$ 	& 	 		\\ \hline
 \end{tabular}
 \end{center}
 
-Mix and Match.
-
-* Mix-and-match~\cite{jakobsson2000mix}
-Our system is based on mix-and-match protocol
-
-a new approach to secure multiparty computation that does not heavily rely on verifiable secret sharing. 
-
-It is based on creating a boolean representation of the computation to be done and representing it in a table. 
-
-Private key is shared among the participants for working on the ciphertexts. 
-
-The participants should decide on a function and its circuit representation before they proceed with the mix and match protocol.
-
-Mix and match protocol guarantees that the participants only learn the output of their jointly chosen function and nothing else.
-
-
-
-
-
-
 \section{Abstentia: system design}
 \label{sec:system}
+
+\begin{figure}[h]
+	\includegraphics[width=1\textwidth]{figures/abstentia.pdf}
+	\caption{figure}
+	\centering
+\end{figure}
+
+
 
 ~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4
 
@@ -259,11 +247,7 @@ and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
 \end{table}
 
 
-\begin{figure}[h]
-	\includegraphics[width=15cm]{figures/diagram}
-	\caption{figure}
-	\centering
-\end{figure}
+
 
 %\begin{table}[]
 %	\begin{tabular}{|l|l|l|l|l|l|}
