@@ -1,0 +1,74 @@
+% !TEX root = ../main.tex
+
+%~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4
+
+%~\textbf{Bob:} can call loadFunds more than once. loadCiphertexts x 4
+
+%~\textbf{Trustee1:} is also the manager. Trustee1 calls  
+%\begin{enumerate}
+%	\item loadOutputs  x 2
+%	\item  createRow1  x 4
+%\end{enumerate}
+%at the beginning of the protocol. 
+%\newline
+%
+%The following is repeated for each PET (8 times): 
+%\begin{enumerate}
+%	\item PET\_subtract
+%	\item DHProve\_Trustee1Pf\_Rand
+%	\item DHProve\_Trustee1Pf\_PartialDec
+%	 \item FullDecryption
+%\end{enumerate}
+%
+%After all PETs are run, Trustee1 has to run the following:
+%\begin{enumerate}
+%	\item matchingRow
+%	\item matchingValue
+%	\item createFinalDecryption
+%	\item loadFinalCiphertext
+%	\item DHProve\_Trustee1Pf\_PartialDec
+%	\item FullDecryption
+%\end{enumerate}
+%
+%~\textbf{Trustee2:} 
+%
+%The following is repeated for each PET (8 times): 
+%\begin{enumerate}
+%	\item DHProve\_Trustee2Pf\_Rand 
+%	\item DHProve\_Trustee2Pf\_PartialDec
+%\end{enumerate}
+%and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
+
+
+\begin{table}[t]
+		\centering
+	\begin{tabular}{|l|l|r|r|}
+		\hline
+		~\textbf{Contract} & ~\textbf{Function } & ~\textbf{Gas}  & ~\textbf{Gas Cost (\$)}  \\ \hline
+		\multirow{9}{*}{}  
+		& Deploy Contract &6091398 & 326.75 \\ \cline{2-4} 
+		& A\&B: Load Funds & 28040  &1.50  \\ \cline{2-4} 
+		& Check Balances &  30359& 1.63 \\  \cline{2-4} 
+		& T1: Load Outputs&  300798 & 16.13 \\  \cline{2-4} 
+		& T1: Create Row & 8741453 & 468.90 \\  \cline{2-4}
+		Mixmatch.sol	& T1: Find Matching Row & 37547 &2.01  \\  \cline{2-4}
+		& T1: Find Matching Value &  40868&2.19 \\  \cline{2-4}
+		& T1:  Create Final Decryption&  4430611& 237.66 \\  \cline{2-4}
+		& A\&B: Send Excess Funds &  41110& 2.21 \\  \cline{2-4}
+		&  A\&B:  Withdraw Fund&  39221& 2.10 \\   \hline
+		\multirow{8}{*}{} 
+		& Deploy Contract & 4681858&251.14 \\ \cline{2-4} 
+		&   A\&B: Load Ciphertexts & 304668 & 16.34 \\  \cline{2-4}
+		& T1: Subtraction & 242131 & 12.99\\  \cline{2-4}
+		& T1: Randomization ZKP& 815340 &  43.74\\  \cline{2-4}
+		PET.sol	&  T2 Randomization ZKP& 393561 &21.11  \\  \cline{2-4}
+		& T1: Partial Dec ZKP& 364298 & 19.54\\  \cline{2-4}
+		& T2: Partial Dec ZKP & 363612 & 19.50 \\  \cline{2-4}
+		& T1: Full Decryption  &  107086& 5.74 \\  \cline{2-4}
+		& T1:  Load Final Ciphertexts& 173945 & 9.33\\ \cline{1-4} 
+	ec.sol	& Deploy Contract &595517 & 31.94 \\ \hline
+	\end{tabular}
+	\caption{Gas costs}
+	%0.0000536405320861138 USD
+	 \label{tab:gascost}
+\end{table}

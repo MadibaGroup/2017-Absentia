@@ -1,5 +1,10 @@
 % !TEX root = ../main.tex
 
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Intro 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
 \section{Introduction}
 
 Consider the traditional multi-party computational setting with a twist: Alice and Bob each have some data, they would like to know the output from running an agreed-upon function on their data, each does not want the other (or anyone else) to learn their data, and they want to simply submit their data (\eg encrypted) to a trustworthy system and come back later for the result. They are willing to pay for this service and understand that, in the worst case of massive collusion between the operators of this service (called trustees), their inputs may be exposed but the result will always be correct.
@@ -7,6 +12,10 @@ Consider the traditional multi-party computational setting with a twist: Alice a
 We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). Can these technologies help? In theory? In practice? We seek to answer this question through direct experimentation. The abstract above builds the argument for why blockchain can help: (1) it provides a integral point of coordination where trustees can post and track progress on the evaluation; (2) it provides an in-band solution for paying the trustees (in either a cryptocurrency like ETH or in a stablecoin pegged to the value of governmental currency like the USD) in a way that is contingent on their performance; and (3) it can serve as the public verifier and can reject any protocol proof that is not correct. When Alice and Bob retrieve the result (whether in plaintext or individually encrypted under their keys), they know it must be correct, otherwise it would not be there waiting for them.
 
 Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimist roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Absentia substantially more practical (with room for further improvement).
+ 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Design Decisions 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
  
 \subsection{Key design decisions}
 
@@ -35,6 +44,10 @@ We are not aware of an explicit \emph{proof} that Mix and Match is publicly veri
 
 \section{Preliminaries}
 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Related Work
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
 \subsection{Related work}
 \label{sec:lit}
 
@@ -48,6 +61,10 @@ The literature has also explored moving computation off-chain while not losing p
 
 The blockchain literature has explored SFE and MPC in several regards. Enigma~\cite{zyskind2015enigma}, perhaps the closest to Absentia, offers stateful MPC as a service. The academic proposal was for its own blockchain and, now as a commercial project, the emphasis is more on providing generic smart contracts with privacy. While it does not run on Ethereum, a bridge contract is available to allow token transfers to their Cosmos/Tendermint-based chain. Absentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Absentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper but is based on succinct zero knowledge~\cite{kosba2016hawk}. Fair MPC is described as an application of Hawk but not implemented.  
 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Mix and Match 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
 
 \subsection{Background}
 
@@ -55,9 +72,9 @@ We provide a basic overview of the Mix and Match protocol for secure function ev
 
 \paragraph{Mix and Match: Pre-computation.} 
 
-In a pre-computation stage, the following is tasks are completed. First, a set of $n$ trustees, identified by public keys, are chosen as well as a threshold of trustees needed to complete the protocol. We implement the simplest case: 2-out-of-2 (we call this distributed as opposed to threshold). Next, the trustees use a distributed key generation (DKG) protocol for creating $n$ shares of the decryption key, which can used for threshold $t-out-of-n$ decryption, as well as a single joint public key. Exponential Elgamal supports DKG and threshold decryption~\cite{Ped91a}.
+In a pre-computation stage, the following tasks are completed. First, a set of $n$ trustees, identified by public keys, are chosen. A threshold of trustees needed to complete the protocol can also be chosen, however we implement the simplest case: 2-out-of-2 (we call this \emph{distributed} as opposed to \emph{threshold}). Next, the trustees use a distributed key generation (DKG) protocol for creating $n$ shares of the decryption key, one for each trustee, as well as a single joint public key. Exponential Elgamal supports DKG and threshold decryption~\cite{Ped91a}.
 
-In Mix and Match, a circuit of the function to be evaluated is produced using multi-input and multi-output lookup tables. We evaluate a single binary NAND gate (a universal gate that can create any circuit) which corresponds to a lookup table with two binary inputs (one from Alice and one from Bob) and a single binary output. During a pre-computation stage, the circuit for the function is established as a sequence of lookup tables (the output from one table can be used as an input to another). Each element of each lookup table is individually encrypted under the trustees' public key (we denote an encryption of $x$ as $\EncB{x}$). 
+In Mix and Match, a circuit of the function to be evaluated is produced using multi-input and multi-output lookup tables. We evaluate a single binary NAND gate (a universal gate that can create any circuit) which corresponds to a lookup table with two binary inputs (one from Alice and one from Bob) and a single binary output. During a pre-computation stage, the circuit for the function is established as a sequence of lookup tables (the output from one table can be used as an input to another). Each element of each lookup table is individually encrypted under the trustees' public key (we denote an encryption of $x$ as $\EncB{x}$):
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -70,7 +87,7 @@ In Mix and Match, a circuit of the function to be evaluated is produced using mu
 \end{tabular}
 \end{center}
 
-The encrypted table is then permuted row-wise. Each trustee mixes the rows, rerandomizes each ciphertext, and proves in zero knowledge that the result is correct. 
+The encrypted table is then permuted row-wise. Each trustee mixes the rows, rerandomizes each ciphertext, and proves in zero knowledge that the result is correct: 
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -100,6 +117,10 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 \end{tabular}
 \end{center}
 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Abstentia on Ethereum 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
 \section{Absentia: system design}
 \label{sec:system}
 
@@ -110,80 +131,9 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 	\label{fig:system}
 \end{figure}
 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-
-%~\textbf{Alice:} can call loadFunds more than once. loadCiphertexts  x 4
-
-%~\textbf{Bob:} can call loadFunds more than once. loadCiphertexts x 4
-
-%~\textbf{Trustee1:} is also the manager. Trustee1 calls  
-%\begin{enumerate}
-%	\item loadOutputs  x 2
-%	\item  createRow1  x 4
-%\end{enumerate}
-%at the beginning of the protocol. 
-%\newline
-%
-%The following is repeated for each PET (8 times): 
-%\begin{enumerate}
-%	\item PET\_subtract
-%	\item DHProve\_Trustee1Pf\_Rand
-%	\item DHProve\_Trustee1Pf\_PartialDec
-%	 \item FullDecryption
-%\end{enumerate}
-%
-%After all PETs are run, Trustee1 has to run the following:
-%\begin{enumerate}
-%	\item matchingRow
-%	\item matchingValue
-%	\item createFinalDecryption
-%	\item loadFinalCiphertext
-%	\item DHProve\_Trustee1Pf\_PartialDec
-%	\item FullDecryption
-%\end{enumerate}
-%
-%~\textbf{Trustee2:} 
-%
-%The following is repeated for each PET (8 times): 
-%\begin{enumerate}
-%	\item DHProve\_Trustee2Pf\_Rand 
-%	\item DHProve\_Trustee2Pf\_PartialDec
-%\end{enumerate}
-%and calls DHProve\_Trustee2Pf\_PartialDec once for the final decryption.
-
-
-\begin{table}[]
-		\centering
-	\begin{tabular}{|l|l|r|r|}
-		\hline
-		~\textbf{Contract} & ~\textbf{Function } & ~\textbf{Gas}  & ~\textbf{Gas Cost (\$)}  \\ \hline
-		\multirow{9}{*}{}  
-		& Deploy Contract &6091398 & 326.75 \\ \cline{2-4} 
-		& A\&B: Load Funds & 28040  &1.50  \\ \cline{2-4} 
-		& Check Balances &  30359& 1.63 \\  \cline{2-4} 
-		& T1: Load Outputs&  300798 & 16.13 \\  \cline{2-4} 
-		& T1: Create Row & 8741453 & 468.90 \\  \cline{2-4}
-		Mixmatch.sol	& T1: Find Matching Row & 37547 &2.01  \\  \cline{2-4}
-		& T1: Find Matching Value &  40868&2.19 \\  \cline{2-4}
-		& T1:  Create Final Decryption&  4430611& 237.66 \\  \cline{2-4}
-		& A\&B: Send Excess Funds &  41110& 2.21 \\  \cline{2-4}
-		&  A\&B:  Withdraw Fund&  39221& 2.10 \\   \hline
-		\multirow{8}{*}{} 
-		& Deploy Contract & 4681858&251.14 \\ \cline{2-4} 
-		&   A\&B: Load Ciphertexts & 304668 & 16.34 \\  \cline{2-4}
-		& T1: Subtraction & 242131 & 12.99\\  \cline{2-4}
-		& T1: Randomization ZKP& 815340 &  43.74\\  \cline{2-4}
-		PET.sol	&  T2 Randomization ZKP& 393561 &21.11  \\  \cline{2-4}
-		& T1: Partial Dec ZKP& 364298 & 19.54\\  \cline{2-4}
-		& T2: Partial Dec ZKP & 363612 & 19.50 \\  \cline{2-4}
-		& T1: Full Decryption  &  107086& 5.74 \\  \cline{2-4}
-		& T1:  Load Final Ciphertexts& 173945 & 9.33\\ \cline{1-4} 
-	ec.sol	& Deploy Contract &595517 & 31.94 \\ \hline
-	\end{tabular}
-	\caption{Gas costs}
-	%0.0000536405320861138 USD
-	 \label{tab:gascost}
-\end{table}
+\paragraph{High level flow.} Figure 1. Participants. What they do. Emphasize it just verification and not actual computation. 
 
 The system is composed of two smart contracts and a library to perform elliptic curve operations. Figure~\ref{fig:system} shows the interaction between the participants and the DApps. At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees at the end of the protocol. They can deposit money any time they want during the protocol. They also load their ciphertexts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Trustee 1 is designated as the manager. 
 
@@ -192,52 +142,13 @@ The system is composed of two smart contracts and a library to perform elliptic 
 Funds are transferred tot the trustees at the end of the protocol, after thay determined the final output. In another possible design, trustees can be paid at each step they performed towards reaching the final output.
 Trustee 1 is responsible for creating the PET contracts by calling create row function and loading the output values for each row at the beginning of the protocol. For each PET, Trustee 1 performs the subtraction. Again for each PET, both Trustee 1 and Trustee 2 proves in zero knowledge that the randomization of the subtraction result is correct and the partial decryption is done correctly. Trustee 1 fully decrypts the result of the subtraction at the end of each PET. After 8 PETs are performed, Trustee 1 finds the matching row and the corresponding encrypted value. Trustee 1 and Trustee 2 partially decrypt and prove in zero knowledge again to obtain the decrypted result.
 
-Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. For the tests run in Truffle the gas limit is set to $12414689$. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}).
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-\begin{table}[!h]
-	\centering
-	\begin{tabular}{|l|r|}
-		\hline
-		~\textbf{Code}	& ~\textbf{Size(bytes)}  \\ \hline
-		bytecode	& 27178  \\ \hline
-		deployed	& 26774  \\ \hline
-		initialisation and constructor code 	& 404 \\ \hline
-	\end{tabular}
-	\caption{Code size for mixmatch.sol}
-	\label{tab:codesize}
-\end{table}
+\paragraph{Payments.} What we do for now. Pointer to discussion section for other options. 
 
-The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}. Contract size limit is 24KB according to EIP170. As our main contract is over this limit, we ran our test in Truffle by allowing unlimited contract size.
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-\begin{table}[!h]
-		\centering
-	\begin{tabular}{|l|r|r|r|r|}
-		\hline
-		& ~\textbf{Alice} &  ~\textbf{Bob} & ~\textbf{Trustee1*}  & ~\textbf{Trustee2}  \\ \hline
-		Number of Transactions	& 5 &5  &44  &17  \\ \hline
-		Total gas cost	& 1246712 &  1246712& 52952603  & 6420996 \\ \hline
-		Total cost in USD	&  66.87& 66.87 &2840.41  & 344.43 \\ \hline
-	\end{tabular}
-	\caption{Cost for each party} 
-	\label{tab:participantcost}
-\end{table}
-
-
-
-\begin{table}[!h]
-		\centering
-	\begin{tabular}{|l|r|}
-	\hline
-	~\textbf{Setting}	& ~\textbf{Total gas}  \\ \hline
-	1 gate, 2 trustees	& 61867023  \\ \hline
-	2 gate, 2 trustees	&  121240622 \\ \hline
-	1 gate, 3 trustees	& 68288019 \\ \hline
-\end{tabular}
-	\caption{Different settings}
-	\label{tab:settings}
-\end{table}
-
-Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two Trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still performs the same number of transactions, as they have to submit their ciphertexts once. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
+\paragraph{Code layout.} Details of testing platform (solidity, \etc). Link to Github. Mathematica is doing what? Solidity is doing what? On Ethereum: Library (why?). PET as module. Factory design (why?) 
 
 ~\textcolor{red}{TO-DO:}
 The system is first implemented in Mathematica to have test vectors for the Solidity implementation. For our example, we used AND gate and there are two trustees that perform the computations. One of the trustees is designated as the manager who is responsible for creating and encrypting the table and finding the matching value at the end of the protocol.
@@ -248,11 +159,45 @@ Factory design pattern is used to realize the system. Mix and match contract cre
 
 Depositing values to each PET vs depositing once
 
-How payments are handled? 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
+\subsection{Measurements}
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+\paragraph{Testing platform.} Truffle. Private network. Custom settings (forward pointer for reason to below). 
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+\input{tables/codesize.tex}
+
+\paragraph{Code size.} Various sizes. Limits of Ethereum. Consequences (changing limit in truffle). Explain table.
+
+The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}. Contract size limit is 24KB according to EIP170. As our main contract is over this limit, we ran our test in Truffle by allowing unlimited contract size.
+
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+\input{tables/gascosts.tex} 
+
+\input{tables/gascosts2.tex}
+
+\input{tables/scale.tex}
+
+\paragraph{Gas costs.} Explain Tables (per function, per participant). Clarify what exactly T1 does. Details of gas to USD.
+
+Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. For the tests run in Truffle the gas limit is set to $12414689$. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}).
+
+Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two Trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still performs the same number of transactions, as they have to submit their ciphertexts once. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
+
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Arbitrum 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \section{Design variant on layer 2 }
 \label{sec:arb}
+
 
 ~\subsection{Arbitrum}
 ~\cite{kalodner2018arbitrum}
@@ -262,47 +207,23 @@ functions are performed off-chain and the result is written back to the chain, w
 
 dispute resolution
 
-\begin{table}[!h]
-	\centering
-	\begin{tabular}{|l|r|r|r|r|r|r|r|}
-		\hline
-		&    \multicolumn{2}{c|}{~\textbf{Ethereum}} & \multicolumn{5}{c|}{~\textbf{Arbitrum}} \\ \hline
-		~\textbf{Function}  &~\textbf{Tx} &~\textbf{Gas}   & ~\textbf{ L1} & ~\textbf{L1}  & ~\textbf{L2} &~\textbf{L2}& ~\textbf{Input Size} \\ 
-		& &  &~\textbf{Tx} &  ~\textbf{Gas} & ~\textbf{Tx}&~\textbf{arbgas}& ~\textbf{(bytes)} \\ 
-		\hline
-		Deploy ec &  ~\href{https://kovan.etherscan.io/tx/0x088af056a640c1fe2188678e52484f89b7ba0bd9345bb0578d91c96aa480c59c}{Link}& 1103372& ~\href{https://kovan.etherscan.io/tx/0xa80f0eb0408f8f1c760abbc223b6a3b24780aba4b85f96ecbd6fb0dfe94bd606}{Link}&80152& ~\href{https://explorer.offchainlabs.com/#/tx/0x7c82717b52cb133c8855c0833d3cbf9ded19f884764fce78de3bb4e27feb63cd}{Link}&1304481&4978\\  \cline{1-8}
-		
-		Deploy PET &  ~\href{https://kovan.etherscan.io/tx/0xb76cda2c91907234afc0b971df893a6dbcdf83d482d2ff3d7d29b4a0b313002f}{Link}&5266352& ~\href{https://kovan.etherscan.io/tx/0x2ec73b92474c991d7b9f8ad1c46f95ef9125513897badb0c0c5faa19bd5b9a55}{Link}&386079& ~\href{https://explorer.offchainlabs.com/#/tx/0x2b1e63c81ca8ab7f4a6fe5333daab515a4e7408121771ae58e205ee037bceb50}{Link}&4260273&24172\\  \cline{1-8}
-		
-		Load Ciphertexts  & ~\href{https://kovan.etherscan.io/tx/0x2cb4bf0f6ce9fc7cabf0c152fdc61ccfff00a0f2e717c85da7eab806fa101b5b}{Link}&305309 &  \href{https://kovan.etherscan.io/tx/0x612e19481fff4ddd1c2dfe260908f15c7c74072a1e733597b4bab1c1209169f4}{Link}& 7869 &\href{https://explorer.offchainlabs.com/#/tx/0x28b3fa1a91d6d6e13005d352940861a026ac029fbc13a58dc969e98ffb5b392c}{Link} &  820507& 742\\  \cline{1-8}
-		
-		Subtraction & ~\href{https://kovan.etherscan.io/tx/0x6eeb3031c81af252df1fb806ae0a57643c20792df7336004465c6a74792c0016}{Link}&260729 & ~\href{https://kovan.etherscan.io/tx/0xa31a5653f3bfbdf7bcce4520c2a4f0e8d38fbc5c19036548199f805a4997cf68}{Link} & 5469& ~\href{https://explorer.offchainlabs.com/#/tx/0xbeff60af08f1b88deabe690322e26794d87595b332f1f1d01095a6a4528c4254}{Link} & 4789799& 550\\  \cline{1-8}
-		
-		T1 Randomization ZKP &~\href{https://kovan.etherscan.io/tx/0x30e8ccff5af6f3489ba2dc11e3198f0216487f380aa2a66ddf97e94650490e88}{Link} &819877 &  ~\href{https://kovan.etherscan.io/tx/0xc08cc82908b7e87e8ddc75695c4f29c3bce3d9a8caced144f003c59e23f4690e}{Link}&  11488&  ~\href{https://explorer.offchainlabs.com/#/tx/0xe3d1ba8bc653397dd67f3bfb602db0acce617668dc2ae2f30e038b4137a60e24}{Link}& 10972720& 644\\  \cline{1-8}
-		
-		T2 Randomization ZKP & ~\href{https://kovan.etherscan.io/tx/0x6dd05a76c771089144583a685c2fb9a6b566a626aa86b568230faf83268fdd92}{Link}& 398245 & ~\href{https://kovan.etherscan.io/tx/0xd790b2edd8800a183068b3253d7e5b00e57d850bce8d9b8572494539b58c7e3c}{Link} &11440& ~\href{https://explorer.offchainlabs.com/#/tx/0x71535a6b6d0124cbd61a4993e5e831cc4ba151eec60b1c368a79686f3f5bc1f4}{Link} & 11069485 & 742 \\  \cline{1-8}
-		
-		T1 Partial Dec ZKP &~\href{https://kovan.etherscan.io/tx/0x477b3e6b645cc672bbbe99ea3e7fa227962a3e1222071c266442a5ab8366e1bb}{Link} &366636 & ~\href{https://kovan.etherscan.io/tx/0xdd0ffc715dc5733bee36fd99d51898cf978de27ece76777099c4570929039a25}{Link} & 11452& ~\href{https://explorer.offchainlabs.com/#/tx/0x9f7fba14177790f6dad6ad9bb0ec3017803b466a27182768b11163162a3961c3}{Link} & 10692786& 742\\  \cline{1-8}
-		
-		T2 Partial Dec ZKP &~\href{https://kovan.etherscan.io/tx/0x59a6282197cbd71b2c25cd5f3547b41ca7baf33322088f35273c97fce5cf8b56}{Link} &366089 & ~\href{https://kovan.etherscan.io/tx/0xb2a71505f192dd2119634ddd69070c52eb3a3d993aeb632ea8f823eb62f26e84}{Link} & 11512&  ~\href{https://explorer.offchainlabs.com/#/tx/0x724578f12940ebd653613c5037576540ce129ef277e4db67aff135711327e8f8}{Link} & 10689113& 742\\  \cline{1-8}
-		
-		Full Decryption & ~\href{https://kovan.etherscan.io/tx/0x172804db2abcef274dedfad8f31f84a0bb26c87826842589537f1d511402b282}{Link} & 124816 &  ~\href{https://kovan.etherscan.io/tx/0x10788165eacbbe25066c163fa0cf7a5af07da32c05af001d0f05ad8946974c6e}{Link}& 6236& ~\href{https://explorer.offchainlabs.com/#/tx/0x3515cc045805f2f9af9f378f4725ab4845679ca15ecd2e86758f8d53eb9a7353}{Link} & 4258675 & 422\\  \hline
-	\end{tabular}
-	\caption{Comparison with arbitrum} 
-	\label{tab:arbitrum}
-\end{table}
+Sequence diagram (generic one)
+
+\subsection{Measurements}
+
+\paragraph{Testing platform.} Truffle. Remix. Kovan network.  
+
+\paragraph{Gas costs.} Explain and discuss Table. How much does one PET cost in total for T1? For T2? What about with arbitrum (just paying gas and assuming arbgas is free)? What is the savings in terms of a percentage?
 
 
-%
-%\begin{sequencediagram}
-%	\newthread{t}{:Thread}
-%	\newinst[1]{i}{:Instance}
-%	
-%	\begin{call}{t}{\href{https://kovan.etherscan.io/tx/0x10788165eacbbe25066c163fa0cf7a5af07da32c05af001d0f05ad8946974c6e}{Text}}{i}{return value}
-%	\end{call}
-%\end{sequencediagram}
+
+\input{tables/arbgas.tex}
 
 
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Discussion 
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \section{Discussion}
 
@@ -313,3 +234,9 @@ dispute resolution
 \item Proxy re-encryption instead of decryption
 \item what else?
 \end{itemize}
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+% = = = Conclusions
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+\section{Concluding Remarks}
