@@ -200,41 +200,40 @@ Table~\ref{tab:settings} compares how the gas costs differ at different settings
 % = = = Arbitrum 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-\section{Design variant on layer 2 }
+\section{Absentia on Layer 2 }
 \label{sec:arb}
-
-\begin{figure}[t]
-	\includegraphics[width=1\textwidth]{figures/arbitrum.pdf}
-	\caption{System overview}
-	\centering
-	\label{fig:system}
-\end{figure}
 
 \subsection{Roll-ups}
 
-A loose collection of technologies, called \emph{Layer 2} solutions, have been proposed to address shortcomings of operating directly on Ethereum (\emph{Layer 1}) or other blockchains~\cite{GMR+20}. These solutions generally strive for one or more of the following: reducing transaction latency, increasing transaction throughput, and/or reducing gas costs. In the case of Absentia, reducing gas costs is paramount. However Layer 2 solutions can also change the threat model; for Absentia, we require that Alice and Bob can trust the final output without having to verify any proofs themselves. 
+A loose collection of technologies, called \emph{Layer 2} solutions, have been proposed to address certain shortcomings of operating directly on Ethereum (\emph{Layer 1}) or other blockchains~\cite{GMR+20}. These solutions generally strive for one or more of the following: reducing transaction latency, increasing transaction throughput, or reducing gas costs. In the case of Absentia, reducing gas costs is paramount. However Layer 2 solutions can also change the threat model; for Absentia, we require that Alice and Bob can trust the final output without having to verify any proofs themselves. 
 
-The most appropriate layer 2 technology for our requirements is called a \emph{roll-up} which targets gas costs. In Ethereum, every transaction is executed (and thus validated) by every Ethereum node. In a roll-up, transactions are executed by off-chain nodes (we will call them \emph{validators} to distinguish them from Ethereum nodes and from Absentia trustees). Validators try to convince the Ethereum network that the result of the transaction execution (\ie the state change of the EVM) is correct without the Ethereum nodes having to execute it. 
+The most appropriate layer 2 technology for our requirements is called a \emph{roll-up} which targets gas costs. In Ethereum, every transaction is executed (and thus validated) by every Ethereum node. In a roll-up, transactions are executed by off-chain nodes called \emph{validators}. Validators try to convince the Ethereum network that the result of the transaction execution (\ie the state change of the EVM) is correct without the Ethereum nodes having to execute it. 
 
-Since Ethereum nodes cannot just ignore the Ethereum protocol's specifications for how to validate transactions, the roll-up cannot be implemented on Ethereum  (Layer 1) today. Rather it is implemented inside its own DApp (Layer 2). This Layer 2 DApp is a container that operates by its own custom consensus rules, and Ethereum developers can choose to deploy their DApps within it. Like any container, this results in isolation between L1 DApps and L2 DApps and extra protocols are required to re-enable interoperability (\eg currency/token transfers and external function calls). In our case, there is no issue if Absentia runs in L2 isolated from the rest of L1 as long as there is an L2 payment mechanism (to pay the trustees).
+Since Ethereum nodes cannot just ignore the Ethereum protocol's specifications for how to validate transactions, the roll-up cannot be implemented on Layer 1. Rather it is implemented inside its own DApp (Layer 2). This Layer 2 DApp is effectively a container, operating by its own custom consensus rules, for DApps that want roll-up functionality. The tradeoff is they are isolated from regular L1 DApps without some additional protocols (\eg interoperability support for currency/token transfers and external function calls). For Abstentia, we do not require interoperability with L1 other than having a payment mechanism.
 
-There are at least two ways to convince on-chain participants that an off-chain computation was performed correctly. The first is to prove it with a succinct proof. SNARKS are one proof-type for general computations that are more efficient to verify than performing the computation itself. The second (\emph{optimistic rollup}) is to have the validator assert the result and then allow for anyone to dispute it. Resolving disputes is always possible by performing the computation itself but disputes can be made more succinctly. If Alice demonstrates that a validator is wrong, the validator is financially punished and Alice is rewarded.
+There are at least two ways to convince on-chain participants that an off-chain computation was performed correctly. The first is to prove it with a succinct proof. SNARKS are one proof-type for general computations that are more efficient to verify than performing the computation itself. The second (an \emph{optimistic rollup}) is to have a validator assert the result and then allow for anyone to dispute it. Resolving disputes is always possible by performing the computation itself but disputes can be settled in a more succinct way (see \cite{KGCWF18}). If Alice demonstrates that a validator is wrong, the validator is financially punished and Alice is rewarded. Such validators do less work than Ethereum nodes (and validators that have to produce SNARKS)---therefore, optimistic rollups enable substantially lower gas costs.
 
 \subsection{Arbitrum}
 
-Arbitrum is Layer 2 solution proposed in a \textit{USENIX Security} paper~\cite{KGCWF18} and now maintained as a commercial project by Offchain Labs. There current produce operates as an optimistic rollup on Ethereum. Instead of operating all Arbitrum contracts (called \emph{ArbOS}) in a container DApp, Arbitrum operates a side-chain and a \emph{bridge contract} provides an interface between Ethereum and Arbitrum.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figures/arbitrum.pdf}
+	\caption{Overview of Arbitrum transaction submission.}
+	\label{fig:arbsys}
+\end{figure}
 
-Sequence diagram (generic one)
+Arbitrum is Layer 2 solution proposed in a \textit{USENIX Security} paper~\cite{KGCWF18} and now maintained as a commercial project by Offchain Labs. Currently, they operate an optimistic rollup on Ethereum. Instead of operating all Arbitrum contracts (called \emph{ArbOS}) in a container DApp on Ethereum, ArbOS instead operates as a side-chain. A  \emph{bridge contract} on Ethereum serves as an interface between Ethereum and Arbitrum. Figure~\ref{fig:arbsys} shows how function calls work on Arbitrum. A user initiates a transaction on Ethereum to the Bridge Contract with the instruction to deploy a contract or run a function, along with all the data required for Arbitrum to perform this transaction. A validator sees new transactions in the inbox of the bridge, executes one and asserts the result to ArbOS. After a dispute period, the transaction is consider finalized. Periodically, the entire state of ArbOS is committed back to Ethereum.  
 
 \subsection{Absentia on Arbitrum}
 
-\paragraph{Testing platform.} Truffle. Remix. Kovan network.  
+\paragraph{Testing platform.} Arbitrum runs a testnet with a bridge on Ethereum's Kovan testnet. As mentioned above, Absentia is too large to deploy (as a factory contract) within Ethereum's contract size limit. To experiment with Arbitrum, we implement only the PET sub-module as a standalone contract. We use Truffle. Instead of sending transactions to the Arbitrum bridge (as in Figure~\ref{fig:arbsys}), Arbitrum allows transactions to be sent to relay server (called an \emph{Aggregator}) which will batch all pending transactions together as a single Kovan transaction to the bridge (and pay the gas). However we report the measurements as if the participants were sending the transactions themselves.
+
+\input{tables/arbgas.tex}
 
 \paragraph{Gas costs.} Explain and discuss Table. How much does one PET cost in total for T1? For T2? What about with arbitrum (just paying gas and assuming arbgas is free)? What is the savings in terms of a percentage?
 
 
 
-\input{tables/arbgas.tex}
 
 
 
