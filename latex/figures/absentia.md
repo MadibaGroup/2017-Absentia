@@ -32,8 +32,8 @@ sequenceDiagram
     T2->>D: Output: Partial Decryption and ZKP 
     D->>D: Transfer Fees to Trustees
 
-    D->>A: Retreive Result
-    D->>B: Retreive Result
+    D->>A: Retrieve Result
+    D->>B: Retrieve Result
     
     
 ```
