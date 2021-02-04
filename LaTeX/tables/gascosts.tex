@@ -45,17 +45,17 @@
 	\begin{tabular}{|l|l|r|r|}
 		\hline
 		~\textbf{Contract} & ~\textbf{Function } & ~\textbf{Gas}  & ~\textbf{Gas Cost (\$)}  \\ \hline
-		\multirow{9}{*}{}  
+		\multirow{8}{*}{}  
 		& Deploy Contract &6,091,398 & 326.75 \\ \cline{2-4} 
 		& A\&B: Load Funds & 28,040  &1.50  \\ \cline{2-4} 
-		& Check Balances &  30,359& 1.63 \\  \cline{2-4} 
+	%	& Check Balances &  30,359& 1.63 \\  \cline{2-4} 
 		& T1: Load Outputs&  300,798 & 16.13 \\  \cline{2-4} 
 		& T1: Create Row & 8,741,453 & 468.90 \\  \cline{2-4}
 		Mixmatch.sol	& T1: Find Matching Row & 37,547 &2.01  \\  \cline{2-4}
 		& T1: Find Matching Value &  40,868&2.19 \\  \cline{2-4}
 		& T1:  Create Final Decryption&  4,430,611& 237.66 \\  \cline{2-4}
-		& A\&B: Send Excess Funds &  41,110& 2.21 \\  \cline{2-4}
-		&  A\&B:  Withdraw Fund&  39,221& 2.10 \\   \hline
+		& A\&B: Withdraw Excess Funds &  41,110& 2.21 \\  \cline{2-4}
+		&  A\&B:  Withdraw Funds&  39,221& 2.10 \\   \hline
 		\multirow{8}{*}{} 
 		& Deploy Contract & 4,681,858&251.14 \\ \cline{2-4} 
 		&   A\&B: Load Ciphertexts & 304,668 & 16.34 \\  \cline{2-4}

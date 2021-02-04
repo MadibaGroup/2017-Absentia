@@ -134,22 +134,21 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \paragraph{High level flow.} 
-Figure~\ref{fig:system} illustrates the high level overview of the system. Mix and Match is done offline and the Ethereum blockchain is used to perform the verifications that the Trustees performed the steps of Mix and Match correctly by posting related proofs on chain.
-
 %Figure 1. Participants. What they do. Emphasize it just verification and not actual computation. Relate it to Mix and Match as explained above. 
+Figure~\ref{fig:system} illustrates the high level overview of the system and how the participants interact with the DApps. The system is composed of a smart contract, called Absentia-DApp, and a sub-module called PET Sub-DApp. Mix and Match is done offline and the Ethereum blockchain is used to perform the verifications that the trustees performed the steps of Mix and Match correctly. Trustees post the proofs related to randomization and partial decryption on chain.
 
-The system is composed of a smart contract, called Absentia-DApp, and a sub-module called PET Sub-DApp. At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees at the end of the protocol. They can deposit money any time they want during the protocol. They also load their ciphertexts. Apart from these functions they perform, they do not have to perform any other function during the execution of the protocol.
+At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees when the protocol ends. They can deposit money any time they want during the protocol. They also load their ciphertexts. Apart from these functions they perform, they do not have to perform any other function during the execution of the protocol. 
+ 
+Trustee 1 is designated as the manager. As Absentia is a submit-and-go  protocol, we prefer to designate a trustee to be the manager and run the functions that can otherwise be run by any other participant. Alternatively, we can have a third party that perform these computations. 
 
-Trustee 1 is designated as the manager. As Absentia is a submit-and-go  protocol, we prefer to designate a Trustee to be the manager and run the functions that can otherwise be run by any other participant. Alternatively, we can have a third party that perform these computations. 
-
-Trustee 1 is responsible for creating the PET contracts by calling create row function and loading the output values for each row at the beginning of the protocol. For each PET, Trustee 1 performs the subtraction. Again for each PET, both Trustee 1 and Trustee 2 proves in zero knowledge that the randomization of the subtraction result is correct and the partial decryption is done correctly. Trustee 1 fully decrypts the result of the subtraction at the end of each PET. During the online phase of Mix and Match, after 8 PETs are performed, Trustee 1 finds the matching row and the corresponding encrypted value. Trustee 1 and Trustee 2 partially decrypt and prove in zero knowledge again to obtain the decrypted result.
+Trustee 1 is responsible for creating the PET contracts and loading the output values for each row at the beginning of the protocol. For each PET, Trustee 1 performs the subtraction. Again for each PET, both Trustee 1 and Trustee 2 proves in zero knowledge that the randomization of the subtraction result is correct and the partial decryption is done correctly. Trustee 1 fully decrypts the result of the subtraction at the end of each PET. During the online phase of Mix and Match, after 8 PETs are performed, Trustee 1 finds the matching row and the corresponding encrypted value. Trustee 1 and Trustee 2 partially decrypt and prove in zero knowledge again to obtain the decrypted result.
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \paragraph{Payments.}
 % What we do for now. Pointer to discussion section for other options. 
 
-Alice and Bob should deposit enough funds before the protocol starts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Funds are transferred to the trustees at the end of the protocol, after they determined the final output. Other possible design choices for the payment scheme are discussed in Section~\ref{sec:discussion}.
+Alice and Bob should deposit enough funds before the protocol starts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Funds are transferred to the trustees at the end of the protocol, after they determine the final output. Other possible design choices for the payment scheme are discussed in Section~\ref{sec:discussion}.
 
 %In another possible design, trustees can be paid at each step they performed towards reaching the final output.
 
@@ -160,15 +159,14 @@ Alice and Bob should deposit enough funds before the protocol starts. Alice and 
 \paragraph{Code layout.} 
 %Details of testing platform (solidity, \etc). Link to Github. Mathematica is doing what? Solidity is doing what? On Ethereum: Library (why?). PET as module. Factory design (why?) 
 
-Absentia is implemented in Mathematica to have test vectors for the smart contracts written in Solidity and verification for offline computations are performed in by the smart contracts using these test vectors~\footnote{Github: link removed for anonymity}.
+Absentia is implemented in Mathematica to have test vectors for the smart contracts written in Solidity and verification for offline computations are performed by the smart contracts using these test vectors~\footnote{Github: link removed for anonymity}. Mixmatch.sol and PET.sol  consists of 214 and 388 lines (SLOC) of Solidity code respectively. ec. sol is the library we use for elliptic curve operations, in order to decrease the gas usage and enhance reusability~\footnote{\url{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}}. 
 
-We use a library for elliptic curve operations~\footnote{\url{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}}, in order to decrease the gas usage and enhance reusability.  As multiplication is an expensive function, we do not perform the multiplication itself in the smart contract. Instead, we use a function called~\textit{ecmulVerify}  ~\footnote{\url{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}}. Multiplication is performed off-chain. The function ~\textit{ecmulVerify}  takes the multiplicand, scalar and the product as input and verifies that the multiplication is done correctly. As we perform the computation needed for Mix and Match protocol offline and perform only the verification on chain, we can use this kind of trick to avoid performing multiplications on chain.
+As multiplication is an expensive function, we do not perform the multiplication itself in the smart contract. Instead, we use a function called~\textit{ecmulVerify}  ~\footnote{\url{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}}. Multiplication is performed off-chain. The function ~\textit{ecmulVerify}  takes the multiplicand, scalar and the product as input and verifies that the multiplication is done correctly. As we perform the computations needed for Mix and Match protocol offline and perform only the verification on chain, we can use this kind of trick to avoid performing multiplications on chain.
 
 Factory design pattern is used in the system. Mix and match contract creates instances of PET contract for each cell in the lookup table, so that Alice and Bob's inputs are compared against related cells. The measurements show that factory pattern is expensive to realize: create row function in mix and match contract creates two instances of PET contract and it costs $8,741,453$ gas, which is the most expensive function in the system (see Table~\ref{tab:gascost}).
 
-
 ~\textcolor{red}{TO-DO:}
-Depositing values to each PET vs depositing once
+In out current design, Alice and Bob have to deposit their inputs again for each PET contract created (8 in total). In another design pattern, we can let Alice and Bob deposit their inputs once to the main contract and then the inputs are loaded to the instances of PET by the main contract. 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
@@ -189,7 +187,7 @@ The smart contracts in Absentia are deployed and tested using Truffle on a local
 \paragraph{Code size.} 
 %Various sizes. Limits of Ethereum. Consequences (changing limit in truffle). Explain table.
 
-The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.  When the contract is deployed, the constructor is run once. The size of the constructor is recorded as 404 bytes. The total size is $27,178$ bytes. Contract size limit is 24KB according to EIP170. As our main contract's size for the deployed code ($26,774$) is over this limit, we ran our test in Truffle by allowing unlimited contract size. We can decrease the contract size by minimizing the code. One solution can be not following the factory design and instead, designating Trustee1 to create 8 PET contracts.
+The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.  When the contract is deployed, the constructor is run once. The size of the constructor is recorded as 404 bytes. The total size of the bytecode is $27,178$ bytes. Contract size limit is 24KB according to EIP170. As our main contract's size for the deployed code ($26,774$) is over this limit, we ran our test in Truffle by allowing unlimited contract size. We can decrease the contract size by minimizing the code. One solution can be not following the factory design and instead, designating Trustee1 to create 8 PET contracts.
 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -203,15 +201,43 @@ The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.
 \paragraph{Gas costs.} 
 
 %Explain Tables (per function, per participant). Clarify what exactly T1 does. Details of gas to USD.
-~\textcolor{red}{TO-DO:} TRUFFLE: gas: Gas limit used for deploys. Default is 6721975
+~\textcolor{red}{TO-DO:} TRUFFLE: gas: Gas limit used for deploys. Default is 6721975, block gas limit?
 
 Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. For the tests run in Truffle the gas limit is set to $12,414,689$. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}. %The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. 
 
-~\textcolor{red}{TO-DO:} Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}). In addition to proofs Trustee 1 has to perform for randomization and partial decryption, Trustee 1 also loads the output values of the lookup table into the contract. 
+~\textcolor{red}{TO-DO:} 
 
-The total transaction count for each participant can be decreased through other design choices. As this is a proof-of-concept code, we aimed to logically separate the functions even though they perform the exact same operation. For instance, ZKP for randomization for Trustee1 and Trustee 2 are two separate functions, even though they essentially perform the same ZKP. Separating the logic like this helped us to better differentiate the computations that should be done by each participant. Another way to decrease the number of transactions is to combine operations in a single function. Trustee 1 can perform subtraction, ZKP for randomization and ZKP for partial decryption in a single function.
+Load outputs: load the values for the output column in the table
 
-Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two Trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still performs the same number of transactions, as for the setting where the output of a gate is fed into the other gate, they have to submit their ciphertexts once. We can assume that Trustee 1 loads the inputs for the second gate. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
+Create row: creates two PET contracts
+
+Find matching row: find which row is the match after performing 8 PETs
+
+Find matching value: returns the output value in the matching row
+
+Create final decryption: creates PET contract to perform the decryption of the output
+
+withdraw funds and withdraw excess funds: these functions are not in the main flow of the protocol. They are logically different (explained in payments), but they have more or less the same amount of gas costs.
+
+Subtraction: subtraction between user's input and the cell.
+
+T1\&T2 randomization ZKP: proof that they randomized the output of the subtraction correctly. These functions have the same logic, designed as different functions for separating the logic.
+
+T1\&T2 partial dec ZKP: proof that they performed partial decryption correctly. These functions have the same logic, designed as different functions for separating the logic.
+
+Full decryption:
+
+Load final ciphertexts: loads the final output into the contract to decrypt the value.
+
+~\textcolor{red}{TO-DO:}  explain why randomization ZKP T1$>$T2??
+
+
+
+Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}). In addition to proofs Trustee 1 has to perform for randomization and partial decryption, Trustee 1 also loads the output values of the lookup table into the contract and determines the final output at the end of the protocol.
+
+The total transaction count for each participant can be decreased by using other design choices. As this is a proof-of-concept code, we aimed to logically separate the functions even though they perform the exact same operation. For instance, ZKP for randomization for Trustee1 and Trustee 2 are two separate functions, even though they essentially perform the same ZKP. Separating the logic like this helped us to better differentiate the computations that should be done by each participant. Another way to decrease the number of transactions is to combine operations in a single function. Trustee 1 can perform subtraction, ZKP for randomization and ZKP for partial decryption in a single function.
+
+Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still perform the same number of transactions, as for the setting where the output of a gate is fed into the other gate, they have to submit their ciphertexts once. We can assume that Trustee 1 loads the inputs for the second gate. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -227,7 +253,7 @@ A loose collection of technologies, called \emph{Layer 2} solutions, have been p
 
 The most appropriate layer 2 technology for our requirements is called a \emph{roll-up} which targets gas costs. In Ethereum, every transaction is executed (and thus validated) by every Ethereum node. In a roll-up, transactions are executed by off-chain nodes called \emph{validators}. Validators try to convince the Ethereum network that the result of the transaction execution (\ie the state change of the EVM) is correct without the Ethereum nodes having to execute it. 
 
-Since Ethereum nodes cannot just ignore the Ethereum protocol's specifications for how to validate transactions, the roll-up cannot be implemented on Layer 1. Rather it is implemented inside its own DApp (Layer 2). This Layer 2 DApp is effectively a container, operating by its own custom consensus rules, for DApps that want roll-up functionality. The tradeoff is they are isolated from regular L1 DApps without some additional protocols (\eg interoperability support for currency/token transfers and external function calls). For Abstentia, we do not require interoperability with L1 other than having a payment mechanism.
+Since Ethereum nodes cannot just ignore the Ethereum protocol's specifications for how to validate transactions, the roll-up cannot be implemented on Layer 1. Rather it is implemented inside its own DApp (Layer 2). This Layer 2 DApp is effectively a container, operating by its own custom consensus rules, for DApps that want roll-up functionality. The tradeoff is they are isolated from regular L1 DApps without some additional protocols (\eg interoperability support for currency/token transfers and external function calls). For Absentia, we do not require interoperability with L1 other than having a payment mechanism.
 
 There are at least two ways to convince on-chain participants that an off-chain computation was performed correctly. The first is to prove it with a succinct proof. SNARKS are one proof-type for general computations that are more efficient to verify than performing the computation itself. The second (an \emph{optimistic rollup}) is to have a validator assert the result and then allow for anyone to dispute it. Resolving disputes is always possible by performing the computation itself but disputes can be settled in a more succinct way (see \cite{KGCWF18}). If Alice demonstrates that a validator is wrong, the validator is financially punished and Alice is rewarded. Such validators do less work than Ethereum nodes (and validators that have to produce SNARKS)---therefore, optimistic rollups enable substantially lower gas costs.
 
