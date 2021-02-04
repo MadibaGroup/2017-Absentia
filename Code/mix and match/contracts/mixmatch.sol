@@ -171,6 +171,8 @@ contract mixmatch
     function createRow3() public 
     {
         require(count == 4);
+        require(balances[alice] >= 10);
+        require(balances[bob] >= 10);
         pet_row3col1 = new PET();
         pet_row3col2 = new PET(); 
         count++;  
