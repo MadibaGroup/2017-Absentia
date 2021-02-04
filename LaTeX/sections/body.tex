@@ -9,9 +9,9 @@
 
 Consider the traditional multi-party computational setting with a twist: Alice and Bob each have some data, they would like to know the output from running an agreed-upon function on their data, each does not want the other (or anyone else) to learn their data, and they want to simply submit their data (\eg encrypted) to a trustworthy system and come back later for the result. They are willing to pay for this service and understand that, in the worst case of massive collusion between the operators of this service (called trustees), their inputs may be exposed but the result will always be correct.
 
-We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). Can these technologies help? In theory? In practice? We seek to answer this question through direct experimentation. The abstract above builds the argument for why blockchain can help: (1) it provides a integral point of coordination where trustees can post and track progress on the evaluation; (2) it provides an in-band solution for paying the trustees (in either a cryptocurrency like ETH or in a stablecoin pegged to the value of governmental currency like the USD) in a way that is contingent on their performance; and (3) it can serve as the public verifier and can reject any protocol proof that is not correct. When Alice and Bob retrieve the result (whether in plaintext or individually encrypted under their keys), they know it must be correct, otherwise it would not be there waiting for them.
+We assume the reader is familiar with blockchain technology, Ethereum, and smart contracts or decentralized apps (DApps). Can these technologies help? In theory? In practice? We seek to answer this question through direct experimentation. The abstract above builds the argument for why blockchain can help: (1) it provides an integral point of coordination where trustees can post and track progress on the evaluation; (2) it provides an in-band solution for paying the trustees (in either a cryptocurrency like ETH or in a stablecoin pegged to the value of governmental currency like the USD) in a way that is contingent on their performance; and (3) it can serve as the public verifier and can reject any protocol proof that is not correct. When Alice and Bob retrieve the result (whether in plaintext or individually encrypted under their keys), they know it must be correct, otherwise it would not be there waiting for them.
 
-Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimist roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Absentia substantially more practical (with room for further improvement).
+Our experiments show that while in theory the idea is sound and we are able to successfully perform a secure function evaluation of a single logic gate (NAND gate) on Ethereum, the costs today are too prohibitive for it to be considered practical. We then turn to so-called layer-2 solutions and show that Arbitrum (an optimistic roll-up that is based on the same trustee model we are already using~\cite{KGCWF18} can make Absentia substantially more practical (with room for further improvement).
  
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 % = = = Design Decisions 
@@ -19,13 +19,13 @@ Our experiments show that while in theory the idea is sound and we are able to s
  
 \subsection{Key design decisions}
 
-Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Absentia provides; and reserve the term multiparty computation (MPC) for a more setting where stateful computations might be performed over time.
+Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Absentia provides; and reserve the term multiparty computation (MPC) ~\textcolor{red}{for a more setting} where stateful computations might be performed over time.
 
-\paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We assume the number of trustees ($n$) can be chosen independently of the number of inputs. In Absentia, we simply our implementation to only support robustness in the case that all trustees ($n$-out-of-$n$) participate, however this could modified to allow the protocol to proceed if only a threshold ($t$ out of $n$ for some $t<n/2$) of trustees participate (this, however, also reduces the number of trustees that need to collude to break the privacy, and potentially correctness, of the protocol).  
+\paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We assume the number of trustees ($n$) can be chosen independently of the number of inputs. ~\textcolor{red}{In Absentia, we simply our implementation} to only support robustness in the case that all trustees ($n$-out-of-$n$) participate, however this could be modified to allow the protocol to proceed if only a threshold ($t$ out of $n$ for some $t<n/2$) of trustees participate (this, however, also reduces the number of trustees that need to collude to break the privacy, and potentially correctness, of the protocol).  
 
-The remaining question is how can Alice and Bob find trustees they assume will not collude? We have several suggestions: (1) it could be based on personal connections; (2) perhaps commercial entities would emerge with either pre-established reputations or earn their reputation over time (similar to oracle providers) and through legally enforceable terms of service; or (3) trustees could be picked at random from a large set of trustees. While (3) may not sound convincing, it is essentially same threat model as the anonymous web-browsing tool Tor which is trusted by vulnerable users (perhaps Tor also uses flavours of (1) via its the EntryGuard program). 
+The remaining question is how can Alice and Bob find trustees they assume will not collude? We have several suggestions: (1) it could be based on personal connections; (2) perhaps commercial entities would emerge with either pre-established reputations or earn their reputation over time (similar to oracle providers) and through legally enforceable terms of service; or (3) trustees could be picked at random from a large set of trustees. While (3) may not sound convincing, it is essentially same threat model as the anonymous web-browsing tool Tor which is trusted by vulnerable users (perhaps Tor also uses flavours of (1) via its EntryGuard program). 
 
-\paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question we is whether MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{sec:arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
+\paragraph{Design decision: Ethereum.} While we are not the first to explore multi-party computation and its relationship to blockchain (see Section~\ref{sec:lit}), we believe we are the first to implement an MPC protocol on a public, commonly used blockchain; namely, Ethereum. The first research question ~\textcolor{red}{we is whether} MPC is even feasible on Ethereum, given the heavy cryptography it uses. Our paper establishes a benchmark that we hope to see improved through future research. Ethereum itself has scheduled scalability plans including Ethereum 2.0 (more transactions per second), and a lot of community resources are also being spent examining and implementing \emph{layer 2} solutions that move blockchain functionality off of the main chain without sacrificing many of its security benefits. Technologies include \emph{state channels}, \emph{sidechains}, and \emph{roll-ups}~\cite{GMR+20}. To experiment with these technologies, we also deploy and benchmark critical components of Absentia on Arbitrum~\cite{KGCWF18}, a recently proposed system for optimistic roll-ups (describe more in Section~\ref{sec:arb}). We now turn to another avenue for improvement, using state-of-the-art MPC protocols.
 
 \paragraph{Design decision: Mix and match.} Starting with Yao in 1982~\cite{Yao82}, the question of how to securely evaluate a general function, when inputs are held by multiple people, has generated a rich body of literature in cryptography. In choosing an SFE/MPC protocol for the basis of Absentia, we looked for one with the following properties:
 
@@ -33,8 +33,8 @@ The remaining question is how can Alice and Bob find trustees they assume will n
 \item \textbf{Trustee model.} As justified above, we seek an MPC/SFE protocol that lets the input holders (\eg Alice and Bob) offload their inputs to a set of non-colluding trustees for evaluation. 
 \item \textbf{Publicly verifiable} (aka publicly auditable or universally verifiable). Many MPC/SFE protocols are in the semi-honest (\ie honest-but-curious) model. Some are resilient to covert or malicious adversaries. We require that not only can adversarial behaviour  be detected by the participates in the protocol, but that it can be detected by anyone (\ie the public). This allows (a) Alice and Bob to offload the computational work to the trustees and still ensure the output is correct, even if they did not directly participate, and (b) Alice and Bob can go further and offload the verification itself to someone they trust---the Ethereum network in this case.
 \item \textbf{Identifiable aborts.} If the protocol does not reach completion, anyone can establish which trustee aborted.
-\item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA signatures) on the elliptic curve \texttt{secp256k1}. For easy of implementation, we prefer a SFE/MPC with the same cryptographic setting. 
-\item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arithmatic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
+\item \textbf{Elliptic curve operations.} While Ethereum can in theory implement different types of cryptography (RSA groups, integer-based discrete logarithms groups, lattices, \etc), it has native support for its own cryptographic operations (ECDSA signatures) on the elliptic curve \texttt{secp256k1}. For ease of implementation, we prefer a SFE/MPC with the same cryptographic setting. 
+\item \textbf{Circuit type.} When the function to be evaluated is represented as a circuit, the circuit could be based on logic gates (\ie NAND gates) or arithmetic operations (\eg additions and multiplications in a modular group). We are indifferent to this design parameter.
 \end{enumerate}
 
 One SPF protocol to meet our purposes is Mix and Match~\cite{JJ00} and we chose it based on our familiarity with it. We are also aware that the state-of-the-art MPC protocols are based on a different paradigm---based on \emph{Beaver triples}~\cite{beaver1997commodity}---initiated by the SPDZ protocol~\cite{damgaard2012multiparty,damgaard2013practical} with many followups (HighGear is a recent example~\cite{keller2018overdrive}). While SPDZ uses lattice-based somewhat homomorphic encryption (SME), this is during a pre-computation phase and Absentia (for now) assumes all pre-computation has been validated. SPDZ also appears amenable to a trustee model and one paper explores a publicly verifiable variant~\cite{baum2014publicly}, however since the authors do not compare themselves to Mix and Match, it would be a complete research project to determine if it is indeed faster. We note that it is not obviously categorically faster---for example, by not requiring public key operations at all: the publicly verifiable variant uses Pedersen commitments extensively.  
@@ -51,13 +51,13 @@ We are not aware of an explicit \emph{proof} that Mix and Match is publicly veri
 \subsection{Related work}
 \label{sec:lit}
 
-The blockchain literature has explored SFE and MPC in several regards. Perhaps the closest to Absentia is Enigma~\cite{zyskind2015decentralizing} which offers stateful MPC as a service. The original academic proposal utilizes a custom blockchain. Now as a commercial project, the emphasis is on providing generic smart contracts with privacy. Engima runs on a Cosmos/Tendermint-based chain, with an Ethereum bridge contract that allows swapping crypto-assets. Absentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Absentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper for contracts~\cite{kosba2016hawk}. It is based on succinct zero knowledge and fair MPC is described as an application of Hawk but not implemented.  
+The blockchain literature has explored SFE and MPC in several regards. Perhaps the closest to Absentia is Enigma~\cite{zyskind2015decentralizing} which offers stateful MPC as a service. The original academic proposal utilizes a custom blockchain. Now as a commercial project, the emphasis is on providing generic smart contracts with privacy. Enigma runs on a Cosmos/Tendermint-based chain, with an Ethereum bridge contract that allows swapping crypto-assets. Absentia is different in the following regards: (1) users provide the circuit they want evaluated, (2) Absentia does not use trusted execution environments (TEE), and (3) we benchmark running natively on Ethereum. Like Enigma, Hawk also provides a privacy wrapper for contracts~\cite{kosba2016hawk}. It is based on succinct zero knowledge and fair MPC is described as an application of Hawk but not implemented.  
 
 %HoneybadgerMPC~\cite{lu2019honeybadgermpc} uses a consensus algorithm to  ???
 
 %~\cite{kiayias2016fair}
 
-The literature has also explored moving computation off-chain while not losing privacy or correctness, however from the perspective a single entity's secret data (\ie verifiable computing as opposed to SFE/MPC). Examples include Zexe~\cite{bowe2020zexe}, ZkVM~\cite{zkvm}, and Raziel~\cite{sanchez2018raziel}. Another research direction, initiated by Andrychowicz \etal~\cite{andrychowicz2014secure}, explores how blockchain technologies can support an off-chain MPC to provide fairness. By contrast, Absentia is performing the SFE on the blockchain. Closely related to SFE/MPC are zero knowledge proofs, whose uses in blockchain are now too prolific to adequately summerize here.
+The literature has also explored moving computation off-chain while not losing privacy or correctness, however from the perspective a single entity's secret data (\ie verifiable computing as opposed to SFE/MPC). Examples include Zexe~\cite{bowe2020zexe}, ZkVM~\cite{zkvm}, and Raziel~\cite{sanchez2018raziel}. Another research direction, initiated by Andrychowicz \etal~\cite{andrychowicz2014secure}, explores how blockchain technologies can support an off-chain MPC to provide fairness. By contrast, Absentia is performing the SFE on the blockchain. Closely related to SFE/MPC are zero knowledge proofs, whose uses in blockchain are now too prolific to adequately summarize here.
 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -134,7 +134,7 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 
 \paragraph{High level flow.} 
 %Figure 1. Participants. What they do. Emphasize it just verification and not actual computation. Relate it to Mix and Match as explained above. 
-Figure~\ref{fig:system} illustrates the high level overview of the system and how the participants interact with the DApps. The system is composed of a smart contract, called Absentia-DApp, and a sub-module called PET Sub-DApp. Mix and Match is done offline and the Ethereum blockchain is used to perform the verifications that the trustees performed the steps of Mix and Match correctly. Trustees post the proofs related to randomization and partial decryption on chain.
+Figure~\ref{fig:system} illustrates the high level overview of the system and how the participants interact with the DApps. The system is composed of a smart contract, called Absentia-DApp (mixmatch.sol), and a sub-module called PET Sub-DApp (PET.sol). Mix and Match is done offline and the Ethereum blockchain is used to perform the verifications that the trustees performed the steps of Mix and Match correctly. Trustees post the proofs related to randomization and partial decryption on chain.
 
 At the beginning of the protocol, Alice and Bob deposit enough funds which will be transferred to the trustees when the protocol ends. They can deposit money any time they want during the protocol. They also load their ciphertexts. Apart from these functions they perform, they do not have to perform any other function during the execution of the protocol. 
  
@@ -147,11 +147,17 @@ Trustee 1 is responsible for creating the PET contracts and loading the output v
 \paragraph{Payments.}
 % What we do for now. Pointer to discussion section for other options. 
 
-Alice and Bob should deposit enough funds before the protocol starts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Funds are transferred to the trustees at the end of the protocol, after they determine the final output. Other possible design choices for the payment scheme are discussed in Section~\ref{sec:discussion}.
+Alice and Bob should deposit enough funds before the protocol starts. Alice and Bob can withdraw all the funds they deposited before the protocol starts, at the end of the protocol or after a certain amount of time passes. They can also transfer themselves the extra funds they have deposited, any time during the execution of the protocol, as long as there are enough funds left to pay the trustees. Funds are transferred to the trustees at the end of the protocol, after they determine the final output. The payment schemes are designed to be resistant to reentrancy attacks by using the a modifier that prevent reentrant calls~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}}.
+
+Other possible design choices for the payment scheme:
+
+Trustees can be paid after each task they finish, rather than being paid at the end of the protocol.
+
+The amount of payment can be made proportional to the work they perform.
 
 %In another possible design, trustees can be paid at each step they performed towards reaching the final output.
 
-% ~\footnote{\url{https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol}} is used to prevent reentrancy attack.
+%  is used to prevent reentrancy attack.
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
@@ -160,11 +166,12 @@ Alice and Bob should deposit enough funds before the protocol starts. Alice and 
 
 Absentia is implemented in Mathematica to have test vectors for the smart contracts written in Solidity and verification for offline computations are performed by the smart contracts using these test vectors~\footnote{Github: link removed for anonymity}. Mixmatch.sol and PET.sol  consists of 214 and 388 lines (SLOC) of Solidity code respectively. ec. sol is the library we use for elliptic curve operations, in order to decrease the gas usage and enhance reusability~\footnote{\url{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}}. 
 
-As multiplication is an expensive function, we do not perform the multiplication itself in the smart contract. Instead, we use a function called~\textit{ecmulVerify}  ~\footnote{\url{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}}. Multiplication is performed off-chain. The function ~\textit{ecmulVerify}  takes the multiplicand, scalar and the product as input and verifies that the multiplication is done correctly. As we perform the computations needed for Mix and Match protocol offline and perform only the verification on chain, we can use this kind of trick to avoid performing multiplications on chain.
+As multiplication is an expensive function, we do not perform the multiplication itself in the smart contract. Instead, we use a function called~\emph{ecmulVerify}  ~\footnote{\url{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}}. Multiplication is performed off-chain. The function ~\emph{ecmulVerify}  takes the multiplicand, scalar and the product as input and verifies that the multiplication is done correctly. As we perform the computations needed for Mix and Match protocol offline and perform only the verification on chain, we can use this kind of trick to avoid performing multiplications on chain.
 
-Factory design pattern is used in the system. Mix and match contract creates instances of PET contract for each cell in the lookup table, so that Alice and Bob's inputs are compared against related cells. The measurements show that factory pattern is expensive to realize: create row function in mix and match contract creates two instances of PET contract and it costs $8,741,453$ gas, which is the most expensive function in the system (see Table~\ref{tab:gascost}).
+Factory design pattern is used in the system. Mix and match contract creates instances of PET contract for each cell in the lookup table, so that Alice and Bob's inputs are compared against related cells. Both contracts follow the order of the functions through state changes. When all PETs are performed, mixmatch contract obtains the final output by finding the matching row.
 
-~\textcolor{red}{TO-DO:}
+The measurements show that factory pattern is expensive to realize: create row function in mix and match contract creates two instances of PET contract and it costs $8,741,453$ gas, which is the most expensive function in the system, as the bytecode for PET should be duplicated to create different instances of the contract each time mixmatch runs create row function(see Table~\ref{tab:gascost}). 
+
 In out current design, Alice and Bob have to deposit their inputs again for each PET contract created (8 in total). In another design pattern, we can let Alice and Bob deposit their inputs once to the main contract and then the inputs are loaded to the instances of PET by the main contract. 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -200,41 +207,14 @@ The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.
 \paragraph{Gas costs.} 
 
 %Explain Tables (per function, per participant). Clarify what exactly T1 does. Details of gas to USD.
-~\textcolor{red}{TO-DO:} TRUFFLE: gas: Gas limit used for deploys. Default is 6721975, block gas limit?
 
-Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. For the tests run in Truffle the gas limit is set to $12,414,689$. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}. %The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. 
-
-~\textcolor{red}{TO-DO:} 
-
-Load outputs: load the values for the output column in the table
-
-Create row: creates two PET contracts
-
-Find matching row: find which row is the match after performing 8 PETs
-
-Find matching value: returns the output value in the matching row
-
-Create final decryption: creates PET contract to perform the decryption of the output
-
-withdraw funds and withdraw excess funds: these functions are not in the main flow of the protocol. They are logically different (explained in payments), but they have more or less the same amount of gas costs.
-
-Subtraction: subtraction between user's input and the cell.
-
-T1\&T2 randomization ZKP: proof that they randomized the output of the subtraction correctly. These functions have the same logic, designed as different functions for separating the logic.
-
-T1\&T2 partial dec ZKP: proof that they performed partial decryption correctly. These functions have the same logic, designed as different functions for separating the logic.
-
-Full decryption:
-
-Load final ciphertexts: loads the final output into the contract to decrypt the value.
-
-~\textcolor{red}{TO-DO:}  explain why randomization ZKP T1$>$T2??
-
-
+Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}. %The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. 
 
 Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}). In addition to proofs Trustee 1 has to perform for randomization and partial decryption, Trustee 1 also loads the output values of the lookup table into the contract and determines the final output at the end of the protocol.
 
 The total transaction count for each participant can be decreased by using other design choices. As this is a proof-of-concept code, we aimed to logically separate the functions even though they perform the exact same operation. For instance, ZKP for randomization for Trustee1 and Trustee 2 are two separate functions, even though they essentially perform the same ZKP. Separating the logic like this helped us to better differentiate the computations that should be done by each participant. Another way to decrease the number of transactions is to combine operations in a single function. Trustee 1 can perform subtraction, ZKP for randomization and ZKP for partial decryption in a single function.
+
+Even though Trustee 1 and Trustee 2 randomization ZKP functions are the same, there is a difference in the gas costs. $815,340$ and $393,561$ for Trustee 1 and Trustee 2 respectively. The reason is that, when Trustee 1's function is run first, new storage is created to hold the necessary values for the ZKP. But, Trustee 2 overwrites these values, which is a cheaper operation.
 
 Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still perform the same number of transactions, as for the setting where the output of a gate is fed into the other gate, they have to submit their ciphertexts once. We can assume that Trustee 1 loads the inputs for the second gate. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
 
