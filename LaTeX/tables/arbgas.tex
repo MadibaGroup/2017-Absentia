@@ -5,8 +5,8 @@
 	\begin{tabular}{|l|r|r|r|r|r|r|r|}
 		\hline
 		&    \multicolumn{2}{c|}{~\textbf{Ethereum}} & \multicolumn{5}{c|}{~\textbf{Arbitrum}} \\ \hline
-		~\textbf{Function}  &~\textbf{Tx} &~\textbf{Gas}   & ~\textbf{ L1} & ~\textbf{L1}  & ~\textbf{L2} &~\textbf{L2}& ~\textbf{Input Size} \\ 
-		& &  &~\textbf{Tx} &  ~\textbf{Gas} & ~\textbf{Tx}&~\textbf{arbgas}& ~\textbf{(bytes)} \\ 
+		~\textbf{Function}  &  &    & ~\textbf{ L1} & ~\textbf{L1}  & ~\textbf{L2} &~\textbf{L2}&  \\ 
+		&~\textbf{Tx} &~\textbf{Gas}  &~\textbf{Tx} &  ~\textbf{Gas} & ~\textbf{Tx}&~\textbf{ArbGas}&~\textbf{Size}  \\ 
 		\hline
 		Deploy ec &  ~\href{https://kovan.etherscan.io/tx/0x088af056a640c1fe2188678e52484f89b7ba0bd9345bb0578d91c96aa480c59c}{Link}& 1103372& ~\href{https://kovan.etherscan.io/tx/0xa80f0eb0408f8f1c760abbc223b6a3b24780aba4b85f96ecbd6fb0dfe94bd606}{Link}&80152& ~\href{https://explorer.offchainlabs.com/#/tx/0x7c82717b52cb133c8855c0833d3cbf9ded19f884764fce78de3bb4e27feb63cd}{Link}&1304481&4978\\  \cline{1-8}
 		
@@ -26,6 +26,6 @@
 		
 		Full Decryption & ~\href{https://kovan.etherscan.io/tx/0x172804db2abcef274dedfad8f31f84a0bb26c87826842589537f1d511402b282}{Link} & 124816 &  ~\href{https://kovan.etherscan.io/tx/0x10788165eacbbe25066c163fa0cf7a5af07da32c05af001d0f05ad8946974c6e}{Link}& 6236& ~\href{https://explorer.offchainlabs.com/#/tx/0x3515cc045805f2f9af9f378f4725ab4845679ca15ecd2e86758f8d53eb9a7353}{Link} & 4258675 & 422\\  \hline
 	\end{tabular}
-	\caption{Comparison between deploying a PET on Ethereum and deploying on Arbitrum (via Ethereum). The links show the reader the actual transactions of a test-run on Kovan/Arbitrum's respective block explorers.} 
-	\label{tab:arbitrum}
+	\caption{Comparison between deploying a plaintext equality test on Ethereum and deploying on Arbitrum (via Ethereum). The links show the reader the actual transactions of a test-run on Kovan/Arbitrum's respective block explorers. Size is the calldata in bytes.} 
+	\label{tab:arbgas}
 \end{table}
