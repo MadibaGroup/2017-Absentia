@@ -248,9 +248,8 @@ A run of PET on Ethereum costs 9,011,425 gas (or 483.38 USD), while on Arbitrum 
 
 \section{Concluding Remarks}
 
-\begin{compactlist}
-\item Expensive for a single gate. Arb is great but still is expensive. Most interesting circuits will be at least 100 gates if not many more.
-\item At the same time, this is a benchmark. Ethereum will improve. L2 will improve. It is a good time to start thinking about how much this costs now. 
-\item MPC/SFE is important for privacy.
-\item What else?
-\end{compactlist}
+Ethereum can compliment secure function evaluation protocols by enabling coordination, providing incentives, and enforcing correctness. Given recent developments in Ethereum toward performance and scalability, we felt it was an appropriate time to benchmark how expensive SFE is on Ethereum. Even though we expected it to be expensive, we did not imagine a single binary NAND gate would cost thousands of dollars on Ethereum. Most `interesting' circuits are probably at least hundreds of gates, with many applications that would require many orders of magnitude more.
+
+Despite this, we argue that Absentia is still an important research contribution. It proves the concept works, establishes a  lower bound, and it sets a new research challenge: through improvements, how many gates can be evaluated for, say, under \$100 USD? Today it might be less than one but we are confident that future research can improve that number substantially. For example, our code can be further optimized; the latest MPC techniques can be applied; and $\Sigma$-protocols can be replaced with succinct zero-knowledge proofs. Meanwhile, Layer 1 and Layer 2 technologies will continue progressing.
+
+
