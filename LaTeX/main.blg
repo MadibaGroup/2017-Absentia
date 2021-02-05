@@ -4,44 +4,44 @@ The top-level auxiliary file: main.aux
 The style file: splncs04.bst
 Database file #1: bib/absentia.bib
 Database file #2: bib/pulp.bib
-You've used 19 entries,
+You've used 22 entries,
             2850 wiz_defined-function locations,
-            688 strings with 7215 characters,
-and the built_in function-call counts, 9131 in all, are:
-= -- 673
-> -- 363
-< -- 2
-+ -- 151
-- -- 130
-* -- 534
-:= -- 1265
-add.period$ -- 21
-call.type$ -- 19
-change.case$ -- 154
+            701 strings with 7457 characters,
+and the built_in function-call counts, 10345 in all, are:
+= -- 765
+> -- 394
+< -- 3
++ -- 164
+- -- 140
+* -- 597
+:= -- 1430
+add.period$ -- 23
+call.type$ -- 22
+change.case$ -- 174
 chr.to.int$ -- 0
-cite$ -- 19
-duplicate$ -- 854
-empty$ -- 871
-format.name$ -- 145
-if$ -- 1932
+cite$ -- 22
+duplicate$ -- 979
+empty$ -- 1003
+format.name$ -- 157
+if$ -- 2196
 int.to.chr$ -- 0
-int.to.str$ -- 19
-missing$ -- 182
-newline$ -- 63
-num.names$ -- 38
-pop$ -- 423
+int.to.str$ -- 22
+missing$ -- 206
+newline$ -- 72
+num.names$ -- 44
+pop$ -- 479
 preamble$ -- 1
-purify$ -- 102
+purify$ -- 113
 quote$ -- 0
-skip$ -- 191
+skip$ -- 222
 stack$ -- 0
-substring$ -- 281
-swap$ -- 359
-text.length$ -- 2
+substring$ -- 320
+swap$ -- 406
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 76
+type$ -- 88
 warning$ -- 0
-while$ -- 60
-width$ -- 21
-write$ -- 180
+while$ -- 69
+width$ -- 24
+write$ -- 207

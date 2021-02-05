@@ -140,7 +140,7 @@ At the beginning of the protocol, the contracts are deployed, indentifying Alice
  
 Certain tasks are public operations that can be performed by anyone. For our analysis, we assume that Trustee 1 is the leader (denoted Trustee 1* with an asterix) and always does these tasks. It is substantially more work, so it might improve the protocol to balance these operations between trustees or to compensate the leader more than the other trustees.
 
-The actual Mix and Match operations done by each trustee is done off-chain using their share of the private key and other secrets (like randomizers) which are always offline. Ethereum is used to record the output of each step, record a zero-knowledge proof that the step was performed correctly, and to actually validate this proof. The DApp will reject any outputs accompanied by invalid or incomplete proofs.
+The actual Mix and Match operations done by each trustee is done off-chain using their share of the private key and other secrets (like randomizers) which are always offline. Ethereum is used to record the output of each step, record a zero-knowledge proof that the step was performed correctly, and to actually validate this proof. The DApp will reject any outputs accompanied by invalid or incomplete proofs. All proofs are $\Sigma$-protocols (specifically Schnorr~\cite{Sch91} or Chaum-Pedersen~\cite{CP92}) made non-interactive with (strong~\cite{BPW12}) Fiat-Shamir~\cite{FS86}. 
  
 For each gate, the Absentia DApp creates enough instances of the PETs (\eg 8 instances for a binary gate) to perform the evaluation. The trustees then interact with the PET contract, running each to completion (a state machine governs each step of the protocol). Note that for simplicity, Absentia requires the trustees to go in a specified order but the underlying protocol is amenable to some concurrency. Once enough PETs are complete that the output is determined, the leader can assert this to the Absentia DApp which will check the state of the PET contracts to confirm. The final output is staged for decryption by the trustees. Alice and Bob can find it on the Absentia DApp. For simplicity, the result is in plaintext however Absentia could be modified to support proxy re-encryption instead of decryption which would leave two final ciphertexts,  encrypted respectively under public keys specified by Alice and Bob. 
 
@@ -164,28 +164,23 @@ Since Absentia generates a lot of PETs to perform the protocol, we implement thi
 
 All contracts enforce the order in which the functions can execute through state changes maintained within the contract. Key state changes emit events. 
 
-
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \subsection{Measurements}
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-\paragraph{Testing platform.} 
-%Truffle. Private network. Custom settings (forward pointer for reason to below). 
-The smart contracts in Absentia are deployed and tested using Truffle on a local blockchain. We used a custom setting for the gas limit and the contract size. We will explain the reasons to do so below.
-
-~\textcolor{red}{TO-DO:} comparing, testing the results between Mathematica and Truffle.
+\paragraph{Testing platform.}  To test Absentia, we use Truffle on a local Ethereum blockchain. Our test files are included on the code repository. We also duplicated Absentia's functionality in Mathematica to help establish correctness.
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \input{tables/codesize.tex}
 
 \paragraph{Code size.} 
-%Various sizes. Limits of Ethereum. Consequences (changing limit in truffle). Explain table.
 
-The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.  When the contract is deployed, the constructor is run once. The size of the constructor is recorded as 404 bytes. The total size of the bytecode is $27,178$ bytes. Contract size limit is 24KB according to EIP170. As our main contract's size for the deployed code ($26,774$) is over this limit, we ran our test in Truffle by allowing unlimited contract size. We can decrease the contract size by minimizing the code. One solution can be not following the factory design and instead, designating Trustee1 to create 8 PET contracts.
+The code size for \texttt{mixmatch.sol} is outlined in Table~\ref{tab:codesize}. When any Ethereum contract is first deployed, the constructor can only be run once. Thus the constructor code does not need to be referenced for further invocations and is not stored with the deployed bytecode (but can be found in the calldata of the deployment transaction). 
 
+When compiled, \texttt{mixmatch.sol} is $26,774$ bytes (plus a constructor of $404$ bytes). Because of the factory design, this includes the bytecode to create \texttt{PET.sol} contracts. Ethereum limits contracts to $\approx$24KB (per EIP170).\footnote{In 2016 when EIP170 was finalized, a 24KB contract could not deploy without crossing the block gas limit, however the gas limit has increased substantially since.} We simply adjust Truffle's limit to allow us to benchmark it as a single contract. However it cannot be deployed on Ethereum today as is. Straightforward options to bring the code under the limit include: (1) taking \texttt{PET.sol} out of the contract and having the leader deploy each PET contract and load the addresses back into \texttt{mixmatch.sol}; (2) move stateless functions to libraries; (3) split the contract up arbitrarily and use \texttt{delegatecall} to execute the pieces in a common context; or (4) find ways to optimize the code to reduce its size (it is academic, proof of concept code, and is very close to the limit, so this should be feasible). 
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
@@ -197,9 +192,7 @@ The code size for the mixmatch contract is outlined in Table~\ref{tab:codesize}.
 
 \paragraph{Gas costs.} 
 
-%Explain Tables (per function, per participant). Clarify what exactly T1 does. Details of gas to USD.
-
-Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}. %The function Create Row creates two instances of PET contract and it is the most expensive function compared to other functions. 
+Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}.
 
 Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}). In addition to proofs Trustee 1 has to perform for randomization and partial decryption, Trustee 1 also loads the output values of the lookup table into the contract and determines the final output at the end of the protocol.
 

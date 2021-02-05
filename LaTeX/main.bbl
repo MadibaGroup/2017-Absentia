@@ -9,8 +9,8 @@ Andreev, O., Glickstein, B., Niu, V., Rinearson, T., Sur, D., Yun, C.: {ZkVM:
 
 \bibitem{andrychowicz2014secure}
 Andrychowicz, M., Dziembowski, S., Malinowski, D., Mazurek, L.: Secure
-  multiparty computations on bitcoin. In: 2014 IEEE Symposium on Security and
-  Privacy. pp. 443--458. IEEE (2014)
+  multiparty computations on bitcoin. In: IEEE Symposium on Security and
+  Privacy (2014)
 
 \bibitem{baum2014publicly}
 Baum, C., Damg{\aa}rd, I., Orlandi, C.: Publicly auditable secure multi-party
@@ -19,10 +19,17 @@ Baum, C., Damg{\aa}rd, I., Orlandi, C.: Publicly auditable secure multi-party
 \bibitem{beaver1997commodity}
 Beaver, D.: Commodity-based cryptography. In: ACM STOC (1997)
 
+\bibitem{BPW12}
+Bernhard, D., Pereira, O., Warinschi, B.: How not to prove yourself: Pitfalls
+  of the fiat-shamir heuristic and applications to helios. In: ASIACRYPT (2012)
+
 \bibitem{bowe2020zexe}
 Bowe, S., Chiesa, A., Green, M., Miers, I., Mishra, P., Wu, H.: Zexe: Enabling
   decentralized private computation. In: IEEE Symposium on Security and Privacy
   (2020)
+
+\bibitem{CP92}
+Chaum, D., Pedersen, T.P.: Wallet databases with observers. In: CRYPTO (1992)
 
 \bibitem{CGS97}
 Cramer, R., Gennaro, R., Schoenmakers, B.: A secure and optimally efficient
@@ -36,6 +43,10 @@ Damg{\aa}rd, I., Keller, M., Larraia, E., Pastro, V., Scholl, P., Smart, N.P.:
 \bibitem{damgaard2012multiparty}
 Damg{\aa}rd, I., Pastro, V., Smart, N., Zakarias, S.: Multiparty computation
   from somewhat homomorphic encryption. In: CRYPTO (2012)
+
+\bibitem{FS86}
+Fiat, A., Shamir, A.: How to prove yourself: practical solutions to
+  identification and signature problems. In: CRYPTO. pp. 186--194 (1986)
 
 \bibitem{GMR+20}
 Gudgeon, L., Moreno-Sanchez, P., Roos, S., McCorry, P., Gervais, A.: Sok:
@@ -70,12 +81,12 @@ Pedersen, T.P.: A threshold cryptosystem without a trusted party. In: EUROCRYPT
 S{\'a}nchez, D.C.: Raziel: Private and verifiable smart contracts on
   blockchains. Tech. Rep. 1807.09484, arXiv (2018)
 
+\bibitem{Sch91}
+Schnorr, C.P.: Efficient signature generation by smart cards. Journal of
+  Cryptography  \textbf{4} (1991)
+
 \bibitem{Yao82}
 Yao, A.C.: Protocols for secure computations. In: IEEE FOCS (1982)
-
-\bibitem{zyskind2015enigma}
-Zyskind, G., Nathan, O., Pentland, A.: Enigma: Decentralized computation
-  platform with guaranteed privacy. arXiv preprint arXiv:1506.03471  (2015)
 
 \bibitem{zyskind2015decentralizing}
 Zyskind, G., Nathan, O., et~al.: Decentralizing privacy: Using blockchain to
