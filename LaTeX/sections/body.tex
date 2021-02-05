@@ -125,7 +125,7 @@ Complete circuits of such tables can be pre-computed by the trustees before Alic
 
 \begin{figure}[t]
 	\includegraphics[width=1\textwidth]{figures/absentia.pdf}
-	\caption{System overview}
+	\caption{Overview of Absentia.}
 	\centering
 	\label{fig:system}
 \end{figure}
@@ -156,7 +156,7 @@ An alternative incentive scheme might pay trustees gradually for each step of th
 
 \paragraph{Code layout.} 
 
-Absentia is implemented in Solidity. All our code and tests are open source.\footnote{Github: link removed for anonymity} The trustees can perform their operations and generate their proofs in a language of their choice; we implement this Mathematica (which we also use generate test vectors for validating the Solidity code). \texttt{Mixmatch.sol} and \texttt{PET.sol} consists of 214 and 388 lines (SLOC) of Solidity code respectively. We also use a standard library for elliptic curve operations.\footnote{Orbs' \href{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}{ECops.sol}}. 
+Absentia is implemented in Solidity. All our code and tests are open source.\footnote{Github: link removed for anonymity} The trustees can perform their operations and generate their proofs in a language of their choice; we implement this Mathematica (which we also use generate test vectors for validating the Solidity code). \texttt{Mixmatch.sol} and \texttt{PET.sol} consists of 214 and 388 lines (SLOC) of Solidity code respectively. We adapt a standard library for elliptic curve operations.\footnote{Orbs' \href{https://github.com/orbs-network/elliptic-curve-solidity/blob/master/ECops.sol}{ECops.sol}}
 
 One optimization we implement concerns scalar multiplication over elliptic curves. Since Solidity is verifying proofs in Absentia, it only has to verify multiplications rather than perform them. Put another way, the trustee supplying the proof to Absentia already knows what the result of every multiplication is and can provide these values. As it turns out, it is cheaper to verify a multiplication than compute one by `abusing' Ethereum's relatively inexpensive opcode for validating ECDSA signatures.\footnote{V. Buterin, 2018. \href{https://ethresear.ch/t/you-can-kinda-abuse-ecrecover-to-do-ecmul-in-secp256k1-today/2384}{You can *kinda* abuse ECRECOVER to do ECMUL in secp256k1 today}}
 
@@ -192,19 +192,13 @@ When compiled, \texttt{mixmatch.sol} is $26,774$ bytes (plus a constructor of $4
 
 \paragraph{Gas costs.} 
 
-Table~\ref{tab:gascost} illustrates the cost of deployment of all contracts needed in Absentia and the functions in the two main contracts. The gas costs are recorded using local blockhain provided by Truffle. To calculate the gas costs, we used 1 gas = 87 Gwei as recorded on Dec 01, 2020~\footnote{https://etherscan.io/chart/gasprice}. The price of ETH is $\$615.07$ for the same date~\footnote{\url{https://coinmarketcap.com/currencies/ethereum/historical-data/}}.
+Table~\ref{tab:gascost} provides the cost to deploy Absentia's two contracts and one library, as well as the gas costs of each function. Note that many functions are invoked more than once in a complete run of Absentia. The gas costs are as reported in Truffle's local network (Ganache). To convert gas into USD, we use 1 gas = 87 Gwei as recorded on Dec 01, 2020.\footnote{\href{https://etherscan.io/chart/gasprice}{Etherscan}} The price of ETH is $\$615.07$ for the same date.\footnote{\href{https://coinmarketcap.com/currencies/ethereum/historical-data/}{Coinmarketcap}}
 
-Trustee 1 has to perform more operations than the other participants as the manager (see Table~\ref{tab:participantcost}). In addition to proofs Trustee 1 has to perform for randomization and partial decryption, Trustee 1 also loads the output values of the lookup table into the contract and determines the final output at the end of the protocol.
+As the leader of the protocol, Trustee 1 (T1*) has to perform more operations than the other participants. Table~\ref{tab:participantcost} shows the costs per participant. Particularly expensive tasks for the leader is loading all the ciphertexts for the circuit into the contract and initializing the memory needed, in particular for each PET, for the working memory. This why, for example, Randomization ZKP is so expensive for T1 as compared to T2 (the code of both functions is identical but gas costs are $815,340$ versus $393,561$). Trustee 1 initializes many state variables (more expensive in Ethereum) that are not needed once the function completes; while trustee 2 overwrites the variables (less expensive in Ethereum). The next function, Partial Decryption, continues overwriting these variables. 
 
-In out current design, Alice and Bob have to deposit their inputs again for each PET contract created (8 in total). In another design pattern, we can let Alice and Bob deposit their inputs once to the main contract and then the inputs are loaded to the instances of PET by the main contract. 
+Our design has some room for improvement. For example, in the current implementation, Alice and Bob have to deposit their inputs for each PET contract that is created (8 in total). A better design pattern (more consistent with Figure~\ref{fig:system}) would have Alice and Bob deposit once in \texttt{mixandmatch.sol} and have the factory contract initialize the PETS with the correct values. Another improvement would aim to reduce the total transaction count for each participant by merging operations that are performed in a sequence by the same participant (we split them into logic blocks to better showcase what the gas was being spent on). 
 
-The total transaction count for each participant can be decreased by using other design choices. As this is a proof-of-concept code, we aimed to logically separate the functions even though they perform the exact same operation. For instance, ZKP for randomization for Trustee1 and Trustee 2 are two separate functions, even though they essentially perform the same ZKP. Separating the logic like this helped us to better differentiate the computations that should be done by each participant. Another way to decrease the number of transactions is to combine operations in a single function. Trustee 1 can perform subtraction, ZKP for randomization and ZKP for partial decryption in a single function.
-
-Even though Trustee 1 and Trustee 2 randomization ZKP functions are the same, there is a difference in the gas costs. $815,340$ and $393,561$ for Trustee 1 and Trustee 2 respectively. The reason is that, when Trustee 1's function is run first, new storage is created to hold the necessary values for the ZKP. But, Trustee 2 overwrites these values, which is a cheaper operation.
-
-Table~\ref{tab:settings} compares how the gas costs differ at different settings compared to our main setting, where two trustees evaluate one gate. When we want to evaluate two circuits, Alice and Bob still perform the same number of transactions, as for the setting where the output of a gate is fed into the other gate, they have to submit their ciphertexts once. We can assume that Trustee 1 loads the inputs for the second gate. The work for Trustee 1 and Trustee 2 is doubled, as they have to evaluate two gates. The cost for the setting, where 3 Trustees are used to evaluate one gate is closer to the cost of the main setting, as the extra cost from Trustee 3 will be the same as Trustee 2.
-
-
+In Table~\ref{tab:settings}, we show how Absentia scales with additional gates and additional trustees. If we want to evaluate a two gate circuit, Alice and Bob still perform the same number of transactions but nearly all of the rest of the functions are run twice as many times. Note that if the output of one gate is fed into the next gate, the leader (T1*) will load the inputs for the second gate. Going back to a single gate, increasing the number of trustees from 2 to 3 is not as expensive. Each additional trustee has a marginal cost equal to Trustee 2's cost in Table~\ref{tab:participantcost}.
 
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 % = = = Arbitrum 
@@ -248,25 +242,15 @@ The ArbGas cost on Arbitrum should be similar to the gas cost on Ethereum, howev
 
 A run of PET on Ethereum costs 9,011,425 gas (or 483.38 USD), while on Arbitrum the cost is 531,697 gas (or 28.52 USD). In this use case, Arbitrum reduces Ethereum gas costs by 94\%.  
 
-
-
-
-% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-% = = = Discussion 
-% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-
-\section{Discussion}
-\label{sec:discussion}
-\begin{itemize}
-\item Payments: fancier, contingent on who aborts, timeliness, \etc
-\item Pre-comp: validate it , have pre-built and validated circuits, \etc
-\item Implementation improvements: factory design and contract size
-\item Proxy re-encryption instead of decryption
-\item what else?
-\end{itemize}
-
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 % = = = Conclusions
 % = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 \section{Concluding Remarks}
+
+\begin{compactlist}
+\item Expensive for a single gate. Arb is great but still is expensive. Most interesting circuits will be at least 100 gates if not many more.
+\item At the same time, this is a benchmark. Ethereum will improve. L2 will improve. It is a good time to start thinking about how much this costs now. 
+\item MPC/SFE is important for privacy.
+\item What else?
+\end{compactlist}
