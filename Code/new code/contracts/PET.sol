@@ -1,28 +1,24 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 import  "./ec.sol";
-
+import "./decrypt.sol";
 contract PET {
      
     uint256  pts = 115792089237316195423570985008687907852837564279074904382605163141518161494337;
     string[] public st ;
 
+    decrypt finalDec;
     //states
-    enum Steps {depositCiphertexts, subtract, Trustee1Pf_Rand, Trustee2Pf_Rand, Trustee1Pf_PartialDec,Trustee2Pf_PartialDec, FullDec,End }
+    enum Steps {depositCiphertexts, subtract, Trustee1Pf_Rand, Trustee2Pf_Rand, decryptionStage,End }
     Steps public step;
     bool public isDone = false;
     uint256[]  alpha;
 
+    uint256[] lastInput;
     // for table and subtraction values
     struct ciphertext {
         uint256[] c1;
         uint256[] c2;
-    }
-
-    // for DH proofs
-    struct DHProof_ciphertext{
-        uint256[]  pf1;
-        uint256[]  pf2;
     }
 
     struct DHProof_scalar{
@@ -45,17 +41,14 @@ contract PET {
     }
 
     
-    constructor(uint256[] memory alice1, uint256 stage) public
+    constructor(uint256[] memory alice1, uint256[] memory cell) public
     {
         alpha = new uint256[](2);
         alpha[0]=55066263022277343669578718895168534326250603453777594175500187360389116729240;
         alpha[1]=32670510020758816978083085130507043184471273380659243275938904335757337482424;
-        st =["depositCiphertexts", "subtract", "Trustee1Pf_Rand", "Trustee2Pf_Rand", "Trustee1Pf_PartialDec","Trustee2Pf_PartialDec", "FullDec", "End"];
+        st =["depositCiphertexts", "subtract", "Trustee1Pf_Rand", "Trustee2Pf_Rand", "decryptionStage", "End"];
 
-        if(stage == 1)
-            loadCiphertexts(alice1);
-        else if(stage == 2)
-            loadFinalCiphertext(alice1);
+        loadCiphertexts(alice1,cell);
        
     }
     
@@ -67,7 +60,12 @@ contract PET {
     mapping(uint => DHProof_scalar) DHProof_scalars;
     mapping(uint => multiplication) multiplications;
 
-  
+    event decryptAddress(address b);
+     // event State(Steps step);
+    event State(string step);
+    event StateAndResult(string step, bool result, uint256 res1, uint256 res2);
+    event anEvent(bool a);
+    event inVals(uint256 a1, uint256 a2, uint256 a3, uint256 a4);
     function getState() public returns( string memory)
     {   
         return st[uint256(step)];
@@ -173,28 +171,9 @@ contract PET {
         return (res1,res2, res);
     } 
 
-    // event State(Steps step);
-
-    event State(string step);
-    event StateAndResult(string step, bool result, uint256 res1, uint256 res2);
-    event anEvent(bool a);
-    function loadFinalCiphertext(uint256[] memory text) public 
-    {
-        require( step == Steps.depositCiphertexts);
-        uint256[] memory c1 = new uint256[](2);
-        c1[0]=text[0];
-        c1[1]=text[1];
-        uint256[] memory c2 = new uint256[](2);
-        c2[0]=text[2];
-        c2[1]=text[3];
-        ciphertext memory c = ciphertext(c1,c2);
-        DHtuples_c1c2[1] = c;
-        step = Steps.Trustee1Pf_PartialDec; 
-        emit State(st[uint256(step)]);
-    }
-
    
-    function loadCiphertexts(uint256[] memory alice1) public 
+   
+    function loadCiphertexts(uint256[] memory alice1, uint256[] memory cell) public 
     {
         require( step == Steps.depositCiphertexts);
    
@@ -207,10 +186,10 @@ contract PET {
         ciphertext memory c = ciphertext(c1,c2);
         encryptions[0] = c;
 
-        c1[0]= alice1[4];
-        c1[1]= alice1[5];
-        c2[0]= alice1[6];
-        c2[1]= alice1[7];
+        c1[0]= cell[0];
+        c1[1]= cell[1];
+        c2[0]= cell[2];
+        c2[1]= cell[3];
         c = ciphertext(c1,c2);
         encryptions[1] = c;
        
@@ -246,6 +225,7 @@ contract PET {
 
     function DHProve_Rand(uint256[] memory input) public returns(bool)
     {
+        require( step == Steps.Trustee1Pf_Rand || step == Steps.Trustee2Pf_Rand);
         bool res = false;
 
         uint256[] memory c1 = new uint256[](2);
@@ -284,17 +264,10 @@ contract PET {
         multiplications[1] = m;
 
         d = DHtuples_c1c2[1];
-        if(step == Steps.Trustee1Pf_Rand || step == Steps.Trustee2Pf_Rand)
-        {
-            res = DHVerifyProof(DHProof_pf1pf2[1].c1, DHProof_pf1pf2[1].c2, s.pf3, m.res11, m.res12, m.res21, m.res22) &&verifyMults(d.c1, d.c2, DHtuples_c1kc2k[1].c1, DHtuples_c1kc2k[1].c2, s.pf3,s.pf4, m.res11, m.res12, m.res21, m.res22); 
-            DHtuples_c1c2[1] = ciphertext(DHtuples_c1kc2k[1].c1, DHtuples_c1kc2k[1].c2);
-        }
-
-        else if(step == Steps.Trustee1Pf_PartialDec || step == Steps.Trustee2Pf_PartialDec)
-        {
-            res = DHVerifyProof(DHProof_pf1pf2[1].c1, DHProof_pf1pf2[1].c2, s.pf3, m.res11, m.res12, m.res21, m.res22) &&verifyMults(alpha, d.c1, DHtuples_c1kc2k[1].c1, DHtuples_c1kc2k[1].c2, s.pf3,s.pf4, m.res11, m.res12, m.res21, m.res22);
-        }
         
+        res = DHVerifyProof(DHProof_pf1pf2[1].c1, DHProof_pf1pf2[1].c2, s.pf3, m.res11, m.res12, m.res21, m.res22) &&verifyMults(d.c1, d.c2, DHtuples_c1kc2k[1].c1, DHtuples_c1kc2k[1].c2, s.pf3,s.pf4, m.res11, m.res12, m.res21, m.res22); 
+        DHtuples_c1c2[1] = ciphertext(DHtuples_c1kc2k[1].c1, DHtuples_c1kc2k[1].c2);
+   
         return res;
 
     }
@@ -310,75 +283,37 @@ contract PET {
         return res;
     }
 
-
+     
      function DHProve_Trustee2Pf_Rand(uint256[] memory input) public returns(bool)
     {
         require( step == Steps.Trustee2Pf_Rand );
         bool res = false;
         res = DHProve_Rand(input);
         if(res)
-        step = Steps.Trustee1Pf_PartialDec;
-        emit anEvent(res);
+        step = Steps.decryptionStage;
+        lastInput = new uint256[] (4);
+        ciphertext memory e = DHtuples_c1c2[1];
+        uint256[] memory c1 = e.c1;
+        uint256[] memory c2 = e.c2;
+        lastInput[0] = c1[0];
+        lastInput[1] = c1[1];
+        lastInput[2] = c2[0];
+        lastInput[3] = c2[1];
+        emit inVals(lastInput[0],lastInput[1],lastInput[2],lastInput[3]);
+        // emit anEvent(res);
         return res;
     }
 
     
-    function DHProve_Trustee1Pf_PartialDec(uint256[] memory input) public returns(bool)
-    {
-        require( step == Steps.Trustee1Pf_PartialDec);
-
-         bool res = false;
-        res = DHProve_Rand(input);
-        
-        if(res)
-        step = Steps.Trustee2Pf_PartialDec;
-
-        emit anEvent(res);
-        return res;
-    }
-
-     function DHProve_Trustee2Pf_PartialDec(uint256[] memory input) public returns(bool)
-    {
-        require( step == Steps.Trustee2Pf_PartialDec);
-     
-         bool res = false;
-        res = DHProve_Rand(input);
-        
-        if(res)
-        step = Steps.FullDec;
-        return res;
-    }
-
   
-       
-      function FullDecryption(uint256[] memory input) public returns(bool r) //returns(bool r, uint256 r1, uint256 r2)
+    function decryptionStage(uint256[] memory inputVals) public 
     {
-        require( step == Steps.FullDec);
-    
-        bool res = false;
-        bool find = false;
-        uint256[] memory finalCiphertext = new uint256[](2);
-        uint256[] memory res2 = new uint256[](2);
-        (finalCiphertext[0], finalCiphertext[1]) = ec.add(input[0], input[1],  input[2], input[3]);
-        (res2[0], res2[1]) = ec.add( input[4], input[5],  input[6], input[7]);
-        uint256[] memory res3 = new uint256[](2);
-        res3[0] = input[4];
-        res3[1] = input[5];
-        res = ecmulVerify(finalCiphertext,pts-1,res3); //multiplicand, uint256 scalar, uint256[] memory product
-        if(res)
-        step = Steps.End;
-        isDone = true;
-        // emit State(st[uint256(step)]);
-       
-        if(res2[0] == 0 && res2[1] == 0)
-            find = true;
-        emit StateAndResult(st[uint256(step)], find, res2[0],res2[1]);
-        require( step == Steps.End);
-
+        require( step == Steps.decryptionStage );
         
-        // return (res,res2[0], res2[1]);
-        return res;
-    }
+        decrypt finalDec = new decrypt(inputVals);
+        step = Steps.End;
 
+        emit decryptAddress(address(finalDec));
+    }
    
 }

@@ -1,7 +1,7 @@
 var ec = artifacts.require("ec");
 var PET = artifacts.require("PET");
 var mixmatch = artifacts.require("mixmatch");
-// var finalDecryption = artifacts.require("finalDecryption");
+var decrypt = artifacts.require("decrypt");
 
 var states = ["depositCiphertexts", "subtract", "Trustee1Pf_Rand", "Trustee2Pf_Rand", "Trustee1Pf_PartialDec","Trustee2Pf_PartialDec", "FullDec","End"]
 
@@ -19,15 +19,16 @@ var cellAlice1 = [
 "8629615038299058650133229612541211743615612002320437984146167320812242257663",
 "25717590769269743486488606897652749857246943733259132861018760127916287320334"];
 
-var aliceAndCell1 =[
-    "105281973541350102623618424841270541573640034801003094469275259693990404862412",
-    "92529900311944459299470608621173826537874745353214591247373049508733979777138",
-    "60594481790610462215830648860827419256489789953089376302954451849465516185852",
-    "39220906895018021323242995984004712857699377289684929455817598337898625559181",
+var aliceAndBobCell1 =[
     "113046537022147669069024032908169935934097678304387197853176214118915089422939",
     "322922486109591304280471533490126198663057826190176368787668022628023139310",
     "8629615038299058650133229612541211743615612002320437984146167320812242257663",
-    "25717590769269743486488606897652749857246943733259132861018760127916287320334"];
+    "25717590769269743486488606897652749857246943733259132861018760127916287320334",
+    "59485430900268833577973695783186878517764653288371712803158204743715149580951", 
+    "47703367898981597084540733904016983783984037050795502989007673118469331648452",
+    "23599409052043967597862297128800218719870285154010150634210015355736031501365" ,
+    "10123124773841340408234381865978191422583081364630499626802145731655996060846"
+    ];
 
 var multiplicationsAlice1=[
 "105281973541350102623618424841270541573640034801003094469275259693990404862412", //Ethereum 5 c1
@@ -135,15 +136,16 @@ var cellAlice2 = [
 "106210814390081389692539346729961543535633950072824207342932568463302919199073", 
 "16238267990918745522318523317093843902075091015697791741534927659461267984072"];
 
-var aliceAndCell2 = [
-    "105281973541350102623618424841270541573640034801003094469275259693990404862412",
-    "92529900311944459299470608621173826537874745353214591247373049508733979777138",
-    "60594481790610462215830648860827419256489789953089376302954451849465516185852",
-    "39220906895018021323242995984004712857699377289684929455817598337898625559181",
+var aliceAndBobCell2 =[ 
     "3709013435061383485277271476962113842369247910660024492809439750502244036853", 
     "31386376425546455949933396653688326301184520366832365449952123855593020851156", 
     "106210814390081389692539346729961543535633950072824207342932568463302919199073", 
-    "16238267990918745522318523317093843902075091015697791741534927659461267984072"];
+    "16238267990918745522318523317093843902075091015697791741534927659461267984072",
+    "71274646672791512855260806642199552968743180163437212474103389096957669625922" ,
+    "4790079543766817878652490149354971613178204068885382698621138463135426648558",
+    "3701546192104148671157477288544470536195977922387518863257605278914215697120", 
+    "29993669392830676314375408139346646620841966541863838476034618794702452283277"
+];
 
 var multiplicationsAlice2=[
 "105281973541350102623618424841270541573640034801003094469275259693990404862412",
@@ -248,15 +250,7 @@ var cellAlice3 = [
 "67910915008779126112455311870674253803523123876694817327414150173568629692411", 
 "31587390107904435948846242759344063074918743544884759120491328582756723659148"];
 
-var aliceAndCell3 = [
-    "105281973541350102623618424841270541573640034801003094469275259693990404862412",
-    "92529900311944459299470608621173826537874745353214591247373049508733979777138",
-    "60594481790610462215830648860827419256489789953089376302954451849465516185852",
-    "39220906895018021323242995984004712857699377289684929455817598337898625559181",
-    "96206671175427187608424776148564663136760130560856181703584103566956753133125", 
-    "11779666983749523294440980371462853660024856166134379703763480822736053464651",
-    "67910915008779126112455311870674253803523123876694817327414150173568629692411", 
-    "31587390107904435948846242759344063074918743544884759120491328582756723659148"];
+
     
 var multiplicationsAlice3=[
 "105281973541350102623618424841270541573640034801003094469275259693990404862412", //Ethereum 5 c1
@@ -1006,7 +1000,7 @@ var finalPartialDec2 = [
 "9642500301286052481354242639031521773371947951228733446238884114000155650890",
 ];
 
-// should be returned by mixmatch ofr test purposes only
+// should be returned by mixmatch for test purposes only
 // var finVal= [
 //     "46344868392469211433747373432794335430652586290510872576786429388781386992701" ,
 //     "18669525545918089638761519268959273639115940702372510776850375384183207238164",
@@ -1065,13 +1059,12 @@ contract('mixmatch', function(accounts) {
         console.log("size of deployed in bytes = ", sizeOfD);
         console.log("initialisation and constructor code in bytes = ", sizeOfB - sizeOfD);
 
-        // accounts[1] = '0xE16e51ae3bFbA8079c504A535f28Cca5962CFB14';
         // load funds to mixmatch contract
         let output = await mixInstance.loadFund({from:accounts[1], value: web3.utils.toWei("0.00000000000000005", "ether")});
         console.log(`loadFund gas: ${output.receipt.gasUsed}`);
         output = await mixInstance.loadFund({from:accounts[2], value: web3.utils.toWei("0.00000000000000005", "ether")});
 
-      /*  console.log("MixmatchBalances after loadFund: ");
+        console.log("MixmatchBalances after loadFund: ");
         output = await mixInstance.checkBalances();
         console.log(`checkBalances gas: ${output.receipt.gasUsed}`);
         event1 = output.receipt.logs[0].args[0];
@@ -1082,38 +1075,49 @@ contract('mixmatch', function(accounts) {
         console.log("trustee1: ", event1.toString());
         event1 = output.receipt.logs[0].args[3];
         console.log("trustee2: ", event1.toString());
-        console.log();*/
+        console.log();
 
+
+
+        output = await mixInstance.loadUserCiphertexts(alice, "alice");
+        output = await mixInstance.loadUserCiphertexts(bob, "bob");
         // mixmatch loadOutputs
         let depositOutputs= await mixInstance.loadOutputs(output1,  1);
         console.log(`loadOutputs gas: ${depositOutputs.receipt.gasUsed}`);
         depositOutputs= await mixInstance.loadOutputs(output2,  3);
-        
+
         console.log("************* PET Row 1 *************")
-        output = await  mixInstance.createRow1(aliceAndCell1, bobAndCell1,1);
+        output = await  mixInstance.createRow1(cellAlice1, cellBob1);
         console.log(`createRow1 gas: ${output.receipt.gasUsed}`);
         let row1col1 = output.receipt.logs[0].args[0];
         let row1col2 = output.receipt.logs[0].args[1];
         const PET_row1col1 = await PET.at(row1col1);
         const PET_row1col2 = await PET.at(row1col2);
 
-        // output = await PET_row1col1.loadCiphertexts(alice, cellAlice1, index);
-        // console.log(`loadCiphertexts gas: ${output.receipt.gasUsed}`);
         output = await PET_row1col1.PET_subtract(multiplicationsAlice1);
         console.log(`PET_subtract gas: ${output.receipt.gasUsed}`);
         output = await PET_row1col1.DHProve_Trustee1Pf_Rand(inputAlice1);
         console.log(`DHProve_Trustee1Pf_Rand gas: ${output.receipt.gasUsed}`);
         output = await PET_row1col1.DHProve_Trustee2Pf_Rand(input1Alice1);
-        let res = output.receipt.logs[0].args[0];
-        console.log(`DHProve_Trustee1Pf_Rand res:` , res);
+        // let res = output.receipt.logs[0].args[0];
+        // console.log(`DHProve_Trustee1Pf_Rand res:` , res);
         console.log(`DHProve_Trustee2Pf_Rand gas: ${output.receipt.gasUsed}`);
-        res = output.receipt.logs[0].args[0];
-        console.log(`DHProve_Trustee2Pf_Rand res:` , res);
-        output = await PET_row1col1.DHProve_Trustee1Pf_PartialDec(input2Alice1);
+       
+        let in1 = output.receipt.logs[0].args[0].toString();
+        let in2 = output.receipt.logs[0].args[1].toString();
+        let in3 = output.receipt.logs[0].args[2].toString();
+        let in4 = output.receipt.logs[0].args[3].toString();
+        let inArr = [in1,in2,in3,in4];
+    
+        output = await PET_row1col1.decryptionStage(inArr);
+        console.log(`decryption stage gas: ${output.receipt.gasUsed}`);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row1col1 = await decrypt.at(event1);
+        output = await PETDec_row1col1.DHProve_Trustee1Pf_PartialDec(input2Alice1);
         console.log(`DHProve_Trustee1Pf_PartialDec gas: ${output.receipt.gasUsed}`);
-        output = await PET_row1col1.DHProve_Trustee2Pf_PartialDec(input3Alice1);
+        output = await PETDec_row1col1.DHProve_Trustee2Pf_PartialDec(input3Alice1);
         console.log(`DHProve_Trustee2Pf_PartialDec gas: ${output.receipt.gasUsed}`);
-        output = await PET_row1col1.FullDecryption(input4Alice1);
+        output = await PETDec_row1col1.FullDecryption(input4Alice1);
         console.log(`FullDecryption gas: ${output.receipt.gasUsed}`);
         event1 = output.receipt.logs[0].args[0];
         console.log("PET1 state: ", event1);
@@ -1125,68 +1129,99 @@ contract('mixmatch', function(accounts) {
         event1 = output.receipt.logs[0].args[3];
         console.log("res1: ", event1.toString());
         console.log()
-        
 
-       // output = await PET_row1col2.loadCiphertexts(bob, cellBob1, indexBob);
+        
         output = await PET_row1col2.PET_subtract(multiplicationsBob1);
         output = await PET_row1col2.DHProve_Trustee1Pf_Rand(inputBob1);
         output = await PET_row1col2.DHProve_Trustee2Pf_Rand(input1Bob1);
-        output = await PET_row1col2.DHProve_Trustee1Pf_PartialDec(input2Bob1);
-        output = await PET_row1col2.DHProve_Trustee2Pf_PartialDec(input3Bob1);
-        output = await PET_row1col2.FullDecryption(input4Bob1);
-        event5 = output.receipt.logs[0].args[0];
-        console.log("PET5 state: ", event5);
-        event5 = output.receipt.logs[0].args[1];
-        let res5 = event5; 
-        console.log("PET5 match: ", event5);
-        event5 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event5.toString());
-        event5 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event5.toString());
+
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row1col2.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row1col2 = await decrypt.at(event1);
+        output = await PETDec_row1col2.DHProve_Trustee1Pf_PartialDec(input2Bob1);
+        output = await PETDec_row1col2.DHProve_Trustee2Pf_PartialDec(input3Bob1);
+        output = await PETDec_row1col2.FullDecryption(input4Bob1);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET2 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res2 = event1; 
+        console.log("PET2 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res2: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res2: ", event1.toString());
         console.log()
 
+
         console.log("************* PET Row 2 *************")
-        output = await  mixInstance.createRow2(aliceAndCell2,bobAndCell2,1);
+        output = await  mixInstance.createRow2(cellAlice2, cellBob2);
         let row2col1 = output.receipt.logs[0].args[0];
         let row2col2 = output.receipt.logs[0].args[1];
         const PET_row2col1 = await PET.at(row2col1);
         const PET_row2col2 = await PET.at(row2col2);
 
-        // output = await PET_row2col1.loadCiphertexts(alice, cellAlice2, index);
         output = await PET_row2col1.PET_subtract(multiplicationsAlice2);
         output = await PET_row2col1.DHProve_Trustee1Pf_Rand(inputAlice2);
         output = await PET_row2col1.DHProve_Trustee2Pf_Rand(input1Alice2);
-        output = await PET_row2col1.DHProve_Trustee1Pf_PartialDec(input2Alice2);
-        output = await PET_row2col1.DHProve_Trustee2Pf_PartialDec(input3Alice2);
-        output = await PET_row2col1.FullDecryption(input4Alice2);
-        event2 = output.receipt.logs[0].args[0];
-        console.log("PET2 state: ", event2);
-        event2 = output.receipt.logs[0].args[1];
-        let res2 = event2; 
-        console.log("PET2 match: ", event2);
-        event2 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event2.toString());
-        event2 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event2.toString());
-        console.log()
 
-        // output = await PET_row2col2.loadCiphertexts(bob, cellBob2, indexBob);
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row2col1.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row2col1 = await decrypt.at(event1);
+        output = await PETDec_row2col1.DHProve_Trustee1Pf_PartialDec(input2Alice2);
+        output = await PETDec_row2col1.DHProve_Trustee2Pf_PartialDec(input3Alice2);
+        output = await PETDec_row2col1.FullDecryption(input4Alice2);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET3 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res3 = event1; 
+        console.log("PET3 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res3: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res3: ", event1.toString());
+        console.log()
+   
+        
         output = await PET_row2col2.PET_subtract(multiplicationsBob2);
         output = await PET_row2col2.DHProve_Trustee1Pf_Rand(inputBob2);
         output = await PET_row2col2.DHProve_Trustee2Pf_Rand(input1Bob2);
-        output = await PET_row2col2.DHProve_Trustee1Pf_PartialDec(input2Bob2);
-        output = await PET_row2col2.DHProve_Trustee2Pf_PartialDec(input3Bob2);
-        output = await PET_row2col2.FullDecryption(input4Bob2);
-        event6 = output.receipt.logs[0].args[0];
-        console.log("PET6 state: ", event6);
-        event6 = output.receipt.logs[0].args[1];
-        let res6 = event6; 
-        console.log("PET6 match: ", event6);
-        event6 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event6.toString());
-        event6 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event6.toString());
+        
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row2col2.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row2col2 = await decrypt.at(event1);
+        output = await PETDec_row2col2.DHProve_Trustee1Pf_PartialDec(input2Bob2);
+        output = await PETDec_row2col2.DHProve_Trustee2Pf_PartialDec(input3Bob2);
+        output = await PETDec_row2col2.FullDecryption(input4Bob2);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET4 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res4 = event1; 
+        console.log("PET4 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res4: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res4: ", event1.toString());
         console.log()
+
+
 
         console.log("Balances after Alice sends excess funds back: ");
         output = await mixInstance.sendexcessfunds(15,{from:accounts[1]});
@@ -1204,114 +1239,157 @@ contract('mixmatch', function(accounts) {
         console.log("trustee2: ", event1.toString(), " ", balance);
 
         console.log()
+       
         console.log("************* PET Row 3 *************")
-        output = await  mixInstance.createRow3(aliceAndCell3,bobAndCell3,1);
+        output = await  mixInstance.createRow3(cellAlice3, cellBob3);
         let row3col1 = output.receipt.logs[0].args[0];
         let row3col2 = output.receipt.logs[0].args[1];
         const PET_row3col1 = await PET.at(row3col1);
         const PET_row3col2 = await PET.at(row3col2);
 
-        // output = await PET_row3col1.loadCiphertexts(alice, cellAlice3, index);
         output = await PET_row3col1.PET_subtract(multiplicationsAlice3);
         output = await PET_row3col1.DHProve_Trustee1Pf_Rand(inputAlice3);
-        output = await PET_row3col1.DHProve_Trustee2Pf_Rand(input1Alice3); // assumption trustee1 did everything right
-        output = await PET_row3col1.DHProve_Trustee1Pf_PartialDec(input2Alice3);
-        output = await PET_row3col1.DHProve_Trustee2Pf_PartialDec(input3Alice3);
-        output = await PET_row3col1.FullDecryption(input4Alice3);
-        event3 = output.receipt.logs[0].args[0];
-        console.log("PET3 state: ", event3);
-        event3 = output.receipt.logs[0].args[1];
-        let res3 = event3; 
-        console.log("PET3 match: ", event3);
-        event3 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event3.toString());
-        event3 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event3.toString());
+        output = await PET_row3col1.DHProve_Trustee2Pf_Rand(input1Alice3); 
+       
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row3col1.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row3col1 = await decrypt.at(event1);
+        output = await PETDec_row3col1.DHProve_Trustee1Pf_PartialDec(input2Alice3);
+        output = await PETDec_row3col1.DHProve_Trustee2Pf_PartialDec(input3Alice3);
+        output = await PETDec_row3col1.FullDecryption(input4Alice3);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET5 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res5 = event1; 
+        console.log("PET5 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res5: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res5: ", event1.toString());
         console.log()
 
-        // output = await PET_row3col2.loadCiphertexts(bob, cellBob3, indexBob);
+    
         output = await PET_row3col2.PET_subtract(multiplicationsBob3);
         output = await PET_row3col2.DHProve_Trustee1Pf_Rand(inputBob3);
         output = await PET_row3col2.DHProve_Trustee2Pf_Rand(input1Bob3);
-        output = await PET_row3col2.DHProve_Trustee1Pf_PartialDec(input2Bob3);
-        output = await PET_row3col2.DHProve_Trustee2Pf_PartialDec(input3Bob3);
-        output = await PET_row3col2.FullDecryption(input4Bob3);
-        event7 = output.receipt.logs[0].args[0];
-        console.log("PET7 state: ", event7);
-        event7 = output.receipt.logs[0].args[1];
-        let res7 = event7; 
-        console.log("PET7 match: ", event7);
-        event7 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event7.toString());
-        event7 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event7.toString());
+        
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row3col2.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row3col2 = await decrypt.at(event1);
+        output = await PETDec_row3col2.DHProve_Trustee1Pf_PartialDec(input2Bob3);
+        output = await PETDec_row3col2.DHProve_Trustee2Pf_PartialDec(input3Bob3);
+        output = await PETDec_row3col2.FullDecryption(input4Bob3);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET6 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res6 = event1; 
+        console.log("PET6 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res6: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res6: ", event1.toString());
         console.log()
 
+
+
         console.log("************* PET Row 4 *************")
-        output = await  mixInstance.createRow4(aliceAndCell4,bobAndCell4,1);
+        output = await  mixInstance.createRow4(cellAlice4, cellBob4);
         let row4col1 = output.receipt.logs[0].args[0];
         let row4col2 = output.receipt.logs[0].args[1];
         const PET_row4col1 = await PET.at(row4col1);
         const PET_row4col2 = await PET.at(row4col2);
 
-        // output = await PET_row4col1.loadCiphertexts(alice, cellAlice4, index);
+   
         output = await PET_row4col1.PET_subtract(multiplicationsAlice4);
         output = await PET_row4col1.DHProve_Trustee1Pf_Rand(inputAlice4);
         output = await PET_row4col1.DHProve_Trustee2Pf_Rand(input1Alice4);
-        output = await PET_row4col1.DHProve_Trustee1Pf_PartialDec(input2Alice4);
-        output = await PET_row4col1.DHProve_Trustee2Pf_PartialDec(input3Alice4);
-        output = await PET_row4col1.FullDecryption(input4Alice4);
-        event4 = output.receipt.logs[0].args[0];
-        console.log("PET4 state: ", event4);
-        event4 = output.receipt.logs[0].args[1];
-        let res4 = event4; 
-        console.log("PET4 match: ", event4);
-        event4 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event4.toString());
-        event4 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event4.toString());
+        
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row4col1.decryptionStage(inArr);
+        console.log(`decryption stage gas: ${output.receipt.gasUsed}`);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row4col1 = await decrypt.at(event1);
+        output = await PETDec_row4col1.DHProve_Trustee1Pf_PartialDec(input2Alice4);
+        output = await PETDec_row4col1.DHProve_Trustee2Pf_PartialDec(input3Alice4);
+        output = await PETDec_row4col1.FullDecryption(input4Alice4);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET7 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res7 = event1; 
+        console.log("PET7 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res7: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res7: ", event1.toString());
         console.log()
 
-       // output = await PET_row4col2.loadCiphertexts(bob, cellBob4, indexBob);
+        
         output = await PET_row4col2.PET_subtract(multiplicationsBob4);
         output = await PET_row4col2.DHProve_Trustee1Pf_Rand(inputBob4);
         output = await PET_row4col2.DHProve_Trustee2Pf_Rand(input1Bob4);
-        output = await PET_row4col2.DHProve_Trustee1Pf_PartialDec(input2Bob4);
-        output = await PET_row4col2.DHProve_Trustee2Pf_PartialDec(input3Bob4);
-        output = await PET_row4col2.FullDecryption(input4Bob4);
-        event8 = output.receipt.logs[0].args[0];
-        console.log("PET8 state: ", event8);
-        event8 = output.receipt.logs[0].args[1];
-        let res8 = event8; 
-        console.log("PET8 match: ", event8);
-        event8 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event8.toString());
-        event8 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event8.toString());
+        
+        in1 = output.receipt.logs[0].args[0].toString();
+        in2 = output.receipt.logs[0].args[1].toString();
+        in3 = output.receipt.logs[0].args[2].toString();
+        in4 = output.receipt.logs[0].args[3].toString();
+        inArr = [in1,in2,in3,in4];
+
+        output = await PET_row4col2.decryptionStage(inArr);
+        event1 = output.receipt.logs[0].args[0];
+        const PETDec_row4col2 = await decrypt.at(event1);
+        output = await PETDec_row4col2.DHProve_Trustee1Pf_PartialDec(input2Bob4);
+        output = await PETDec_row4col2.DHProve_Trustee2Pf_PartialDec(input3Bob4);
+        output = await PETDec_row4col2.FullDecryption(input4Bob4);
+        event1 = output.receipt.logs[0].args[0];
+        console.log("PET8 state: ", event1);
+        event1 = output.receipt.logs[0].args[1];
+        let res8 = event1; 
+        console.log("PET8 match: ", event1);
+        event1 = output.receipt.logs[0].args[2];
+        console.log("res8: ", event1.toString());
+        event1 = output.receipt.logs[0].args[3];
+        console.log("res8: ", event1.toString());
         console.log()
 
-        let aliceCol = [res1,res2, res3,res4];
-        let bobCol = [res5,res6, res7,res8];
+        let aliceCol = [res1,res3, res5,res7];
+        let bobCol = [res2,res4, res6,res8];
 
         output = await  mixInstance.matchingRow(aliceCol,bobCol);
         console.log(`matchingRow gas: ${output.receipt.gasUsed}`);
         event9 = output.receipt.logs[0].args[0];
-        console.log("Matching row: ", event9.toString());
+        console.log("Matching row: ", event9.toString()); 
 
 
         console.log("************* PET 9 - Final output *************")
         output = await mixInstance.matchingValue(event9.toString());
         console.log(`matchingValue gas: ${output.receipt.gasUsed}`);
         let finalValue = [output.receipt.logs[0].args[0],output.receipt.logs[0].args[1],output.receipt.logs[0].args[2],output.receipt.logs[0].args[3] ];
-        output = await  mixInstance.createFinalDecryption(finalValue,2);
+        output = await  mixInstance.createFinalDecryption(finalValue);
         console.log(`createFinalDecryption gas: ${output.receipt.gasUsed}`);
         let final = output.receipt.logs[0].args[0];
-        const PET_final= await PET.at(final);
-        // output = await PET_final.loadFinalCiphertext(finalValue);
-        // console.log(`loadFinalCiphertext gas: ${output.receipt.gasUsed}`);
+        const PET_final= await decrypt.at(final);
+  
         output = await PET_final.DHProve_Trustee1Pf_PartialDec(finalPartialDec1);
         // console.log(output.receipt.logs[0].args[0]);
         output = await PET_final.DHProve_Trustee2Pf_PartialDec(finalPartialDec2);
+        // console.log(output.receipt.logs[0].args[0]);
         output = await PET_final.FullDecryption(fulldecinputs);
         event8 = output.receipt.logs[0].args[0];
         console.log("PET9 state: ", event8);
@@ -1319,9 +1397,9 @@ contract('mixmatch', function(accounts) {
         res8 = event8; 
         console.log("PET9 match: ", event8);
         event8 = output.receipt.logs[0].args[2];
-        console.log("res1: ", event8.toString());
+        console.log("res: ", event8.toString());
         event8 = output.receipt.logs[0].args[3];
-        console.log("res1: ", event8.toString());
+        console.log("res: ", event8.toString());
         console.log();
 
         console.log("Balances at the end: ");
