@@ -61,7 +61,7 @@ contract mixmatch
     {
         //send to msg.sender check the amount
        // require(step == Steps.End || step == Steps.depositCiphertexts || now > 30 days + create );
-        require(count == 9 || count == 1 || now > 30 days + create );
+        require(count == 11 || count == 1 || now > 30 days + create );
         require(balances[msg.sender]>= amount);
         
         if(msg.sender.send(amount)) // send vs transfer one of them exception reentrancy call: unlimited gas reentrancy guard
@@ -122,26 +122,9 @@ contract mixmatch
         // emit depositAmount(msg.value, msg.sender);
     }
 
-    function loadUserCiphertexts(uint256[] memory alice1, string memory name) public // for Alice and Bob
+function loadTableCiphertexts(uint256[] memory alice1) public // for Alice and Bob
     {
-        require(balances[alice] >= 10);
-        require(balances[bob] >= 10);
-        require(count ==1 && inputcount<2 );
-
-        uint256[2] memory c1 ;
-        c1[0]=alice1[0];
-        c1[1]=alice1[1];
-        uint256[2] memory c2 ;
-        c2[0]=alice1[2];
-        c2[1]=alice1[3];
-        ciphertext memory c = ciphertext(c1,c2);
-        table[name] = c;
-        inputcount++;
-       
-    }
-  /*  function loadTableCiphertexts(uint256[] memory alice1) public // for Alice and Bob
-    {
-   
+        require(count ==1  );
         uint256[2] memory c1;
         c1[0]=alice1[0];
         c1[1]=alice1[1];
@@ -156,42 +139,42 @@ contract mixmatch
         c2[0]= alice1[6];
         c2[1]= alice1[7];
         c = ciphertext(c1,c2);
-        table["R1C2"] = c;
+        table["R2C1"] = c;
 
         c1[0]=alice1[8];
         c1[1]=alice1[9];
         c2[0]=alice1[10];
         c2[1]=alice1[11];
         c = ciphertext(c1,c2);
-        table["R2C1"] = c;
+        table["R3C1"] = c;
 
         c1[0]= alice1[12];
         c1[1]= alice1[13];
         c2[0]= alice1[14];
         c2[1]= alice1[15];
         c = ciphertext(c1,c2);
-        table["R2C2"] = c;
+        table["R4C1"] = c;
 
         c1[0]=alice1[16];
         c1[1]=alice1[17];
         c2[0]=alice1[18];
         c2[1]=alice1[19];
         c = ciphertext(c1,c2);
-        table["R3C1"] = c;
+        table["R1C2"] = c;
 
         c1[0]= alice1[20];
         c1[1]= alice1[21];
         c2[0]= alice1[22];
         c2[1]= alice1[23];
         c = ciphertext(c1,c2);
-        table["R3C2"] = c;
+        table["R2C2"] = c;
 
         c1[0]= alice1[24];
         c1[1]= alice1[25];
         c2[0]= alice1[26];
         c2[1]= alice1[27];
         c = ciphertext(c1,c2);
-        table["R4C1"] = c;
+        table["R3C2"] = c;
 
         c1[0]= alice1[28];
         c1[1]= alice1[29];
@@ -199,14 +182,35 @@ contract mixmatch
         c2[1]= alice1[31];
         c = ciphertext(c1,c2);
         table["R4C2"] = c;
+        count++;
        
-    }*/
+    }
 
-    function loadOutputs(uint256[] memory output, uint256 startIndex) public 
+    function loadUserCiphertexts(uint256[] memory alice1, string memory name) public // for Alice and Bob
     {
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
-        require(count ==1 && outputcount<2 ); //but it will be called twice
+        require(count ==2 && inputcount<2 );
+
+        uint256[2] memory c1 ;
+        c1[0]=alice1[0];
+        c1[1]=alice1[1];
+        uint256[2] memory c2 ;
+        c2[0]=alice1[2];
+        c2[1]=alice1[3];
+        ciphertext memory c = ciphertext(c1,c2);
+        table[name] = c;
+        inputcount++;
+        if(inputcount == 2)
+            count++;
+       
+    }
+    
+    function loadOutputs(uint256[] memory output) public 
+    {
+        require(balances[alice] >= 10);
+        require(balances[bob] >= 10);
+        require(count ==3 ); //but it will be called twice
         uint256[2] memory c1 ;
         c1[0]=output[0];
         c1[1]=output[1];
@@ -215,148 +219,259 @@ contract mixmatch
         c2[0]=output[2];
         c2[1]=output[3];
         ciphertext memory c = ciphertext(c1,c2);
-        encryptions[startIndex] = c;
+        encryptions[1] = c;
 
         c1[0]=output[4];
         c1[1]=output[5];
         c2[0]=output[6];
         c2[1]=output[7];
         c = ciphertext(c1,c2);
-        startIndex++;
-        encryptions[startIndex] = c;
-        outputcount++;
-        if(outputcount==2)
-            count ++;
+        encryptions[2] = c;
+       
+        c1[0]=output[8];
+        c1[1]=output[9];
+        c2[0]=output[10];
+        c2[1]=output[11];
+        c = ciphertext(c1,c2);
+
+        c1[0]=output[12];
+        c1[1]=output[13];
+        c2[0]=output[14];
+        c2[1]=output[15];
+        c = ciphertext(c1,c2);
+
+        count ++;
+        // require(balances[alice] >= 10);
+        // require(balances[bob] >= 10);
+        // require(count ==1 && outputcount<2 ); //but it will be called twice
+        // uint256[2] memory c1 ;
+        // c1[0]=output[0];
+        // c1[1]=output[1];
+
+        // uint256[2] memory c2  ;
+        // c2[0]=output[2];
+        // c2[1]=output[3];
+        // ciphertext memory c = ciphertext(c1,c2);
+        // encryptions[startIndex] = c;
+
+        // c1[0]=output[4];
+        // c1[1]=output[5];
+        // c2[0]=output[6];
+        // c2[1]=output[7];
+        // c = ciphertext(c1,c2);
+        // startIndex++;
+        // encryptions[startIndex] = c;
+        // outputcount++;
+        // if(outputcount==2)
+        //     count ++;
 }
 
     
-    function createRow1(uint256[] memory cell1,  uint256[] memory cell2) public 
+    function createRow1() public 
     {
-        require(count == 2);
+        require(count == 4);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
 
         ciphertext memory c = table["alice"];
         uint256[2] memory a1 = c.c1;
         uint256[2] memory a2 = c.c2;
-        uint256[] memory a3 = new uint256[](4);
+        uint256[] memory userCell = new uint256[](4);
       
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
 
-        pet_row1col1 = new PET(a3, cell1);
+        c = table["R1C1"];
+        a1 = c.c1;
+        a2 = c.c2;
+        uint256[] memory tableCell = new uint256[](4);
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+
+        pet_row1col1 = new PET(userCell, tableCell);
+
         c = table["bob"];
         a1 = c.c1;
         a2 = c.c2;
        
       
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
         
-        pet_row1col2 = new PET(a3, cell2);   
+        c = table["R1C2"];
+        a1 = c.c1;
+        a2 = c.c2;
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+        pet_row1col2 = new PET(userCell, tableCell);   
 
         count++;
         emit rowAddresses(address(pet_row1col1),address(pet_row1col2));
     }
-   function createRow2(uint256[] memory cell1,  uint256[] memory cell2) public 
+   function createRow2() public 
     {
-        require(count == 3);
+        require(count == 5);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
         
         ciphertext memory c = table["alice"];
         uint256[2] memory a1 = c.c1;
         uint256[2] memory a2 = c.c2;
-        uint256[] memory a3 = new uint256[](4);
+        uint256[] memory userCell = new uint256[](4);
       
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
 
-        pet_row2col1 = new PET(a3, cell1);
+        c = table["R2C1"];
+        a1 = c.c1;
+        a2 = c.c2;
+        uint256[] memory tableCell = new uint256[](4);
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+
+        pet_row2col1 = new PET(userCell, tableCell);
         c = table["bob"];
         a1 = c.c1;
         a2 = c.c2;
        
-      
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
         
-        pet_row2col2 = new PET(a3, cell2);  
+        c = table["R2C2"];
+        a1 = c.c1;
+        a2 = c.c2;
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+        
+        pet_row2col2 = new PET(userCell, tableCell);  
 
         count++;  
         emit rowAddresses(address(pet_row2col1),address(pet_row2col2));
     }
 
-    function createRow3(uint256[] memory cell1,  uint256[] memory cell2) public 
+    function createRow3() public 
     {
-        require(count == 4);
+        require(count == 6);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
         
         ciphertext memory c = table["alice"];
         uint256[2] memory a1 = c.c1;
         uint256[2] memory a2 = c.c2;
-        uint256[] memory a3 = new uint256[](4);
+        uint256[] memory userCell = new uint256[](4);
       
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
 
-        pet_row3col1 = new PET(a3, cell1);
+        c = table["R3C1"];
+        a1 = c.c1;
+        a2 = c.c2;
+
+        uint256[] memory tableCell = new uint256[](4);
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+
+        pet_row3col1 = new PET(userCell, tableCell);
+
         c = table["bob"];
         a1 = c.c1;
         a2 = c.c2;
        
-      
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
         
-        pet_row3col2 = new PET(a3, cell2);  
+        c = table["R3C2"];
+        a1 = c.c1;
+        a2 = c.c2;
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+        
+        
+        pet_row3col2 = new PET(userCell, tableCell);  
 
 
         count++;  
         emit rowAddresses(address(pet_row3col1),address(pet_row3col2));
     }
 
-    function createRow4(uint256[] memory cell1, uint256[] memory cell2) public 
+    function createRow4() public 
     {
-        require(count == 5);
+        require(count == 7);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
 
         ciphertext memory c = table["alice"];
         uint256[2] memory a1 = c.c1;
         uint256[2] memory a2 = c.c2;
-        uint256[] memory a3 = new uint256[](4);
+        uint256[] memory userCell = new uint256[](4);
       
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
 
-        pet_row4col1 = new PET(a3, cell1);
+        c = table["R4C1"];
+        a1 = c.c1;
+        a2 = c.c2;
+
+        uint256[] memory tableCell = new uint256[](4);
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+
+        pet_row4col1 = new PET(userCell, tableCell);
         c = table["bob"];
         a1 = c.c1;
         a2 = c.c2;
        
-      
-        a3[0] = a1[0];
-        a3[1] = a1[1];
-        a3[2] = a2[0];
-        a3[3] = a2[1];
+        userCell[0] = a1[0];
+        userCell[1] = a1[1];
+        userCell[2] = a2[0];
+        userCell[3] = a2[1];
         
-        pet_row4col2 = new PET(a3, cell2);  
+        c = table["R4C2"];
+        a1 = c.c1;
+        a2 = c.c2;
+      
+        tableCell[0] = a1[0];
+        tableCell[1] = a1[1];
+        tableCell[2] = a2[0];
+        tableCell[3] = a2[1];
+        
+        
+        pet_row4col2 = new PET(userCell, tableCell);  
         
         count++;  
         emit rowAddresses(address(pet_row4col1),address(pet_row4col2));
@@ -364,7 +479,7 @@ contract mixmatch
  
     function matchingRow(bool[] memory aliceCol, bool[] memory bobCol) public  returns(uint256)
     {
-        require(count == 6);
+        require(count == 8);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
         uint256 row = 1234;
@@ -382,7 +497,7 @@ contract mixmatch
     }
     function matchingValue(uint256 index) public
     {
-        require(count == 7);
+        require(count == 9);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
         ciphertext memory e = encryptions[index];
@@ -394,7 +509,7 @@ contract mixmatch
 
     function createFinalDecryption(uint256[] memory alice1) public
     {
-        require(count == 8);
+        require(count == 10);
         require(balances[alice] >= 10);
         require(balances[bob] >= 10);
         finaldec =new decrypt(alice1);
