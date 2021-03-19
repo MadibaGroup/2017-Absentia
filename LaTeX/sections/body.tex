@@ -19,7 +19,7 @@ Our experiments show that while in theory the idea is sound and we are able to s
  
 \subsection{Key design decisions}
 
-Note that we use the term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Absentia provides; and reserve the term multiparty computation (MPC) for a more complex setting where stateful computations might be performed over time.
+Note that we use the more precise term secure function evaluation (SFE) to describe the stateless, one-shot evaluation that Absentia provides. We think of SFE as a subset of secure multiparty computation (MPC)---a more general setting which includes stateful computations performed over time.
 
 \paragraph{Design decision: Trustee model.} In keeping with our priority for a submit-and-go protocol, someone has to perform the actual evaluation of the function on the inputs. We call these entities \emph{trustees}. We require that the number of trustees ($n$) can be chosen independently of the number of inputs. In Absentia, we assume all trustees ($n$-out-of-$n$) participate (and can identify any that do not). However Absentia could be modified to allow the protocol to proceed if only a threshold ($t$ out of $n$) of trustees participate---however, also reduces the number of trustees that need to collude to break the privacy of the protocol.   
 
